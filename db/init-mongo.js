@@ -1,10 +1,17 @@
-db = db.getSiblingDB('usersdb');
+db = db.getSiblingDB('gradebookDB');
 
-// Create a 'users' collection and insert an initial user
+// USERS COLLECTION
 db.createCollection('users');
 db.users.insertOne({
-  name: 'Admin',
+  name: 'Admin User',
   email: 'admin@example.com',
   role: 'admin',
+  password: 'admin123',
   createdAt: new Date(),
 });
+
+// ATTENDANCE COLLECTION
+db.createCollection('attendance');
+
+// MESSAGES COLLECTION
+db.createCollection('messages');

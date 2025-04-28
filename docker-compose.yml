@@ -34,19 +34,37 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
     networks:
       - gradebook-net
     restart: unless-stopped
 
-  user-service:
+  users-service:
     build:
-      context: ./services/user-service
+      context: ./services/users-service
       dockerfile: Dockerfile
-    container_name: user-service
+    container_name: users-service
     ports:
-      - "${USER_SERVICE_PORT:-8001}:8001"
+      - "${USERS_SERVICE_PORT:-8001}:8001"
     environment:
-      PORT_USER_SERVICE: ${USER_SERVICE_PORT:-8001}
+      PORT_USER_SERVICE: ${USERS_SERVICE_PORT:-8001}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
+  grades-service:
+    build:
+      context: ./services/grades-service
+      dockerfile: Dockerfile
+    container_name: grades-service
+    ports:
+      - "${GRADES_SERVICE_PORT:-8001}:8001"
+    environment:
+      PORT_USER_SERVICE: ${GRADES_SERVICE_PORT:-8001}
       MONGO_URI: ${MONGO_URI}
       MONGO_DB_NAME: ${MONGO_DB_NAME}
     depends_on:

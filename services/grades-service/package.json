@@ -1,0 +1,17 @@
+{
+    "name": "grades-service",
+    "version": "1.0.0",
+    "main": "src/app.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "nodemon src/server.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.0",
+        "express": "^4.18.2",
+        "mongodb": "^5.7.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.0"
+    }
+}
