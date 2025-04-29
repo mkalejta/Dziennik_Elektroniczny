@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS timetable (
 CREATE TABLE IF NOT EXISTS grades (
     id VARCHAR(255) PRIMARY KEY,
     student_id VARCHAR(255) NOT NULL,
+    grade FLOAT NOT NULL,
     subject_id VARCHAR(255) NOT NULL,
     teacher_id VARCHAR(255) NOT NULL,
-    grade FLOAT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

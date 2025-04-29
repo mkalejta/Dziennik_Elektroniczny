@@ -52,6 +52,7 @@ services:
       MONGO_DB_NAME: ${MONGO_DB_NAME}
     depends_on:
       - mongodb
+      - postgres
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -69,6 +70,61 @@ services:
       MONGO_DB_NAME: ${MONGO_DB_NAME}
     depends_on:
       - mongodb
+      - postgres
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+  
+  subjects-service:
+    build:
+      context: ./services/subjects-service
+      dockerfile: Dockerfile
+    container_name: subjects-service
+    ports:
+      - "${SUBJECTS_SERVICE_PORT:-8003}:8003"
+    environment:
+      PORT_SUBJECT_SERVICE: ${SUBJECTS_SERVICE_PORT:-8003}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
+  attendance-service:
+    build:
+      context: ./services/attendance-service
+      dockerfile: Dockerfile
+    container_name: attendance-service
+    ports:
+      - "${ATTENDANCE_SERVICE_PORT:-8004}:8004"
+    environment:
+      PORT_ATTENDANCE_SERVICE: ${ATTENDANCE_SERVICE_PORT:-8004}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
+  timetable-service:
+    build:
+      context: ./services/timetable-service
+      dockerfile: Dockerfile
+    container_name: timetable-service
+    ports:
+      - "${TIMETABLE_SERVICE_PORT:-8005}:8005"
+    environment:
+      PORT_TIMETABLE_SERVICE: ${TIMETABLE_SERVICE_PORT:-8005}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+      - postgres
     networks:
       - gradebook-net
     restart: unless-stopped
