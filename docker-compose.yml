@@ -129,6 +129,24 @@ services:
       - gradebook-net
     restart: unless-stopped
 
+  messages-service:
+    build:
+      context: ./services/messages-service
+      dockerfile: Dockerfile
+    container_name: messages-service
+    ports:
+      - "${MESSAGES_SERVICE_PORT:-8006}:8006"
+    environment:
+      PORT_MESSAGES_SERVICE: ${MESSAGES_SERVICE_PORT:-8006}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
 networks:
   gradebook-net:
 

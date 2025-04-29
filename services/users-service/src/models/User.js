@@ -5,7 +5,7 @@ class User {
     this._id = _id;
     this.name = name;
     this.email = email;
-    this.role = role;
+    this.role = role; // 'admin' or 'student' or 'teacher' or 'parent'
     this.password = password;
     this.createdAt = createdAt;
   }
