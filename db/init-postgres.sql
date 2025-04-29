@@ -34,3 +34,12 @@ CREATE TABLE IF NOT EXISTS grades (
     teacher_id VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tworzenie tabeli Students Classes
+CREATE TABLE IF NOT EXISTS students_classes (
+    id VARCHAR(255) PRIMARY KEY,
+    student_id VARCHAR(255) NOT NULL,
+    class_id VARCHAR(255) NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (class_id) REFERENCES class(id)
+);
