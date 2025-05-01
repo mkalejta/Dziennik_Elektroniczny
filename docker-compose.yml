@@ -39,6 +39,40 @@ services:
       - gradebook-net
     restart: unless-stopped
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.6
+    container_name: keycloak
+    command: start-dev
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_postgres:5432/${KEYCLOAK_DB_NAME}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    depends_on:
+      - keycloak_postgres
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
+  keycloak_postgres:
+    image: postgres:16
+    container_name: keycloak_postgres
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
   users-service:
     build:
       context: ./services/users-service
@@ -147,9 +181,29 @@ services:
       - gradebook-net
     restart: unless-stopped
 
+  classes-service:
+    build:
+      context: ./services/classes-service
+      dockerfile: Dockerfile
+    container_name: classes-service
+    ports:
+      - "${CLASS_SERVICE_PORT:-8007}:8007"
+    environment:
+      PORT_MESSAGES_SERVICE: ${CLASS_SERVICE_PORT:-8007}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
 networks:
   gradebook-net:
 
 volumes:
   mongo_data:
   postgres_data:
+  keycloak_data:
+  keycloak_postgres_data:

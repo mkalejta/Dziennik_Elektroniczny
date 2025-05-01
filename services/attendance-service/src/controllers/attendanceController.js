@@ -62,8 +62,8 @@ async function getAttendanceByStudentId(req, res) {
         const db = req.app.locals.db;
         const studentId = req.params.studentId;
 
-        const attendance = await db.collection('attendance').find({ studentId }).toArray();
-        res.json(attendance.map(record => new Attendance(record)));
+        const attendance = await db.collection('attendance').find({ "students.id": studentId }).toArray();
+        res.json(attendance);
     } catch (error) {
         console.error(error);
         res.status(500).send('Server error');
