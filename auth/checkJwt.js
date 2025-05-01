@@ -1,18 +1,27 @@
-const jwt = require('express-jwt');
-const jwksRsa = require('jwks-rsa');
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
 
-const keycloakRealm = 'gradebook';
-const keycloakHost = process.env.KEYCLOAK_URL || 'http://keycloak:8080';
-
-const checkJwt = jwt.expressjwt({
-    secret: jwksRsa.expressJwtSecret({
-        cache: true,
-        rateLimit: true,
-        jwksUri: `${keycloakHost}/realms/${keycloakRealm}/protocol/openid-connect/certs`,
-    }),
-    issuer: `${keycloakHost}/realms/${keycloakRealm}`,
-    algorithms: ['RS256'],
-    credentialsRequired: true,
+const client = jwksClient({
+  jwksUri: `${KEYCLOAK_URL}/realms/${KEYCLOACK_REALM}/protocol/openid-connect/certs`,
 });
+
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, function (err, key) {
+    const signingKey = key.getPublicKey();
+    callback(null, signingKey);
+  });
+}
+
+function checkJwt(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: 'Brak nagłówka Authorization' });
+
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, getKey, { algorithms: ['RS256'] }, (err, decoded) => {
+    if (err) return res.status(401).json({ message: 'Nieprawidłowy token' });
+    req.auth = decoded;
+    next();
+  });
+}
 
 module.exports = checkJwt;

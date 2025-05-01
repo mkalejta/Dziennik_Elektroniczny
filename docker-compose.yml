@@ -73,6 +73,25 @@ services:
       - gradebook-net
     restart: unless-stopped
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "${API_GATEWAY_PORT:-8081}:8081"
+    environment:
+      - KEYCLOAK_PUBLIC_URL=${KEYCLOAK_PUBLIC_URL}
+      - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+    depends_on:
+      - keycloak
+    networks:
+      - gradebook-net
+    restart: unless-stopped
+
   users-service:
     build:
       context: ./services/users-service
