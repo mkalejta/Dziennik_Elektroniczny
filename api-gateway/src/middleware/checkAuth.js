@@ -1,37 +1,55 @@
 import jwt from 'jsonwebtoken';
-import jwksClient from 'jwks-rsa';
+import jwksRsa from 'jwks-rsa';
 import axios from 'axios';
 
 const {
-    KEYCLOAK_URL,
+    KEYCLOAK_PUBLIC_URL,
+    KEYCLOAK_INTERNAL_URL,
     KEYCLOAK_REALM,
     KEYCLOAK_CLIENT_ID,
     KEYCLOAK_CLIENT_SECRET,
 } = process.env;
 
-const client = jwksClient({
-    jwksUri: `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`,
+const client = jwksRsa({
+    jwksUri: `${KEYCLOAK_INTERNAL_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs`,
 });
 
 function getKey(header, callback) {
     client.getSigningKey(header.kid, (err, key) => {
+        if (err) {
+            console.error('Błąd podczas pobierania klucza:', err);
+            return callback(err);
+        }
         const signingKey = key.getPublicKey();
         callback(null, signingKey);
     });
 }
 
 export async function checkAuth(req, res, next) {
-    const accessToken = req.cookies['access_token'];
+    const authHeader = req.headers['authorization'];
+    let accessToken = null;
 
-    if (!accessToken) return res.status(401).json({ message: 'Brak tokenu logowania' });
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        accessToken = authHeader.split(' ')[1];
+    } else {
+        accessToken = req.cookies['access_token'];
+    }
 
-    jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
+    if (!accessToken) {
+        return res.status(401).json({ message: 'Brak tokenu logowania' });
+    }
+
+    jwt.verify(accessToken, getKey, {
+        audience: 'frontend-client',
+        issuer: `${KEYCLOAK_PUBLIC_URL}/realms/${KEYCLOAK_REALM}`,
+        algorithms: ['RS256']
+    }, async (err, decoded) => {
         if (!err) {
             req.user = decoded;
             return next();
         }
 
-        // Jeśli token wygasł, następuje próbua odświeżenia go
+        // Jeśli token wygasł, następuje próba odświeżenia go
         if (err.name === 'TokenExpiredError') {
             const refreshToken = req.cookies['refresh_token'];
             if (!refreshToken) return res.status(401).json({ message: 'Brak refresh tokenu' });
@@ -44,23 +62,27 @@ export async function checkAuth(req, res, next) {
                 params.append('refresh_token', refreshToken);
 
                 const { data } = await axios.post(
-                    `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`,
+                    `${KEYCLOAK_INTERNAL_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`,
                     params
                 );
 
                 res.cookie('access_token', data.access_token, {
                     httpOnly: true,
-                    sameSite: 'Strict',
+                    sameSite: 'Lax',
                     secure: false,
                 });
 
                 res.cookie('refresh_token', data.refresh_token, {
                     httpOnly: true,
-                    sameSite: 'Strict',
+                    sameSite: 'Lax',
                     secure: false,
                 });
 
-                jwt.verify(data.access_token, getKey, { algorithms: ['RS256'] }, (verifyErr, decodedNew) => {
+                jwt.verify(data.access_token, getKey, { 
+                    audience: 'gradebook-realm',
+                    issuer: `${KEYCLOAK_PUBLIC_URL}/realms/${KEYCLOAK_REALM}`,
+                    algorithms: ['RS256']
+                }, (verifyErr, decodedNew) => {
                     if (verifyErr) return res.status(403).json({ message: 'Błąd weryfikacji nowego tokenu' });
                     req.user = decodedNew;
                     next();

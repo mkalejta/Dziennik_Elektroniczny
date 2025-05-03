@@ -5,10 +5,10 @@ services:
     image: mongo:7.0
     container_name: mongodb
     ports:
-      - "${MONGO_PORT:-27017}:27017"
+      - "${PORT_MONGO:-27017}:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     command: ["mongod", "--bind_ip_all"]
     volumes:
       - mongo_data:/data/db
@@ -27,11 +27,11 @@ services:
     image: postgres:16
     container_name: postgres
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${PORT_POSTGRES:-5432}:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
@@ -44,14 +44,14 @@ services:
     container_name: keycloak
     command: start-dev
     ports:
-      - "8080:8080"
+      - "${PORT_KEYCLOAK:-8080}:8080"
     environment:
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://keycloak_postgres:5432/${KEYCLOAK_DB_NAME}
-      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
-      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak_postgres:5432/${KEYCLOAK_DB_NAME}
+      - KC_DB_USERNAME=${KEYCLOAK_DB_USER}
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
     depends_on:
       - keycloak_postgres
     volumes:
@@ -64,9 +64,9 @@ services:
     image: postgres:16
     container_name: keycloak_postgres
     environment:
-      POSTGRES_DB: ${KEYCLOAK_DB_NAME}
-      POSTGRES_USER: ${KEYCLOAK_DB_USER}
-      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      - POSTGRES_DB=${KEYCLOAK_DB_NAME}
+      - POSTGRES_USER=${KEYCLOAK_DB_USER}
+      - POSTGRES_PASSWORD=${KEYCLOAK_DB_PASSWORD}
     volumes:
       - keycloak_postgres_data:/var/lib/postgresql/data
     networks:
@@ -79,13 +79,14 @@ services:
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
-      - "${API_GATEWAY_PORT:-8081}:8081"
+      - "${PORT_API_GATEWAY:-8081}:8081"
     environment:
       - KEYCLOAK_PUBLIC_URL=${KEYCLOAK_PUBLIC_URL}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
       - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
       - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - PORT_API_GATEWAY=${PORT_API_GATEWAY:-8081}
     depends_on:
       - keycloak
     networks:
@@ -98,11 +99,16 @@ services:
       dockerfile: Dockerfile
     container_name: users-service
     ports:
-      - "${USERS_SERVICE_PORT:-8001}:8001"
+      - "${PORT_USERS_SERVICE:-8001}:8001"
     environment:
-      PORT_USER_SERVICE: ${USERS_SERVICE_PORT:-8001}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_USER_SERVICE=${PORT_USERS_SERVICE:-8001}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+      - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -116,11 +122,14 @@ services:
       dockerfile: Dockerfile
     container_name: grades-service
     ports:
-      - "${GRADES_SERVICE_PORT:-8001}:8001"
+      - "${PORT_GRADES_SERVICE:-8002}:8002"
     environment:
-      PORT_USER_SERVICE: ${GRADES_SERVICE_PORT:-8001}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_GRADES_SERVICE=${PORT_GRADES_SERVICE:-8002}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -134,11 +143,14 @@ services:
       dockerfile: Dockerfile
     container_name: subjects-service
     ports:
-      - "${SUBJECTS_SERVICE_PORT:-8003}:8003"
+      - "${PORT_SUBJECTS_SERVICE:-8003}:8003"
     environment:
-      PORT_SUBJECT_SERVICE: ${SUBJECTS_SERVICE_PORT:-8003}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_SUBJECT_SERVICE=${PORT_SUBJECTS_SERVICE:-8003}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -152,11 +164,14 @@ services:
       dockerfile: Dockerfile
     container_name: attendance-service
     ports:
-      - "${ATTENDANCE_SERVICE_PORT:-8004}:8004"
+      - "${PORT_ATTENDANCE_SERVICE:-8004}:8004"
     environment:
-      PORT_ATTENDANCE_SERVICE: ${ATTENDANCE_SERVICE_PORT:-8004}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_ATTENDANCE_SERVICE=${PORT_ATTENDANCE_SERVICE:-8004}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -170,11 +185,14 @@ services:
       dockerfile: Dockerfile
     container_name: timetable-service
     ports:
-      - "${TIMETABLE_SERVICE_PORT:-8005}:8005"
+      - "${PORT_TIMETABLE_SERVICE:-8005}:8005"
     environment:
-      PORT_TIMETABLE_SERVICE: ${TIMETABLE_SERVICE_PORT:-8005}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE:-8005}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -188,11 +206,14 @@ services:
       dockerfile: Dockerfile
     container_name: messages-service
     ports:
-      - "${MESSAGES_SERVICE_PORT:-8006}:8006"
+      - "${PORT_MESSAGES_SERVICE:-8006}:8006"
     environment:
-      PORT_MESSAGES_SERVICE: ${MESSAGES_SERVICE_PORT:-8006}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE:-8006}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres
@@ -206,11 +227,14 @@ services:
       dockerfile: Dockerfile
     container_name: classes-service
     ports:
-      - "${CLASS_SERVICE_PORT:-8007}:8007"
+      - "${PORT_CLASS_SERVICE:-8007}:8007"
     environment:
-      PORT_MESSAGES_SERVICE: ${CLASS_SERVICE_PORT:-8007}
-      MONGO_URI: ${MONGO_URI}
-      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      - PORT_MESSAGES_SERVICE=${PORT_CLASS_SERVICE:-8007}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - NODE_PATH=${NODE_PATH}
+    volumes:
+      - ./shared:/usr/src/app/shared:ro
     depends_on:
       - mongodb
       - postgres

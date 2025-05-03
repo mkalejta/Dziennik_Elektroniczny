@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', userController.getAllUsers);
 router.post('/', userController.createUser);

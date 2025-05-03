@@ -4,20 +4,34 @@ import { checkAuth } from '../middleware/checkAuth.js';
 
 const router = express.Router();
 
-const proxy = createProxyMiddleware({
-    target: 'http://users-service:8001',
-    changeOrigin: true,
-    pathRewrite: {
-        '^/api/users': '',
-    },
-    onProxyReq: (proxyReq, req) => {
-        const token = req.cookies['access_token'];
-        if (token) {
-            proxyReq.setHeader('Authorization', `Bearer ${token}`);
-        }
-    }
-});
+const serviceMap = {
+    '/users': 'http://users-service:8001',
+    '/grades': 'http://grades-service:8002',
+    '/subjects': 'http://subjects-service:8003',
+    '/attendance': 'http://attendance-service:8004',
+    '/timetable': 'http://timetable-service:8005',
+    '/messages': 'http://messages-service:8006',
+    '/classes': 'http://classes-service:8007',
+};
 
-router.use('/users', checkAuth, proxy);
+console.log(Object.keys(serviceMap));
+
+
+Object.keys(serviceMap).forEach((path) => {
+    router.use(
+        `${path}`,
+        checkAuth,
+        createProxyMiddleware({
+            target: serviceMap[path],
+            changeOrigin: true,
+            onProxyReq: (proxyReq, req) => {
+                const token = req.cookies['access_token'];
+                if (token) {
+                    proxyReq.setHeader('Authorization', `Bearer ${token}`);
+                }
+            },
+        })
+    );
+});
 
 export default router;

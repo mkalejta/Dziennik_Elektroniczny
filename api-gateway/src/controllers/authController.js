@@ -53,13 +53,13 @@ export async function handleRedirect(req, res) {
 
     res.cookie('access_token', data.access_token, {
       httpOnly: true,
-      sameSite: 'Strict',
+      sameSite: 'Lax',
       secure: false,
     });
 
     res.cookie('refresh_token', data.refresh_token, {
       httpOnly: true,
-      sameSite: 'Strict',
+      sameSite: 'Lax',
       secure: false,
     });
 
