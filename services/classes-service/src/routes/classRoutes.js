@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const classController = require('../controllers/classController');
+const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', classController.getClasses);
 router.post('/', classController.createClass);

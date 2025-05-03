@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const gradeRoutes = require('./routes/gradeRoutes');
 const connectMongo = require('./db/mongoClient');
+const checkJwt = require(`${process.env.NODE_PATH}/middleware/checkJwt`);
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,7 @@ app.use(express.json());
   const db = await connectMongo();
   app.locals.db = db;
 
-  app.use('/api/grades', gradeRoutes);
+  app.use('/api/grades', checkJwt, gradeRoutes);
 
   const PORT = process.env.PORT_GRADE_SERVICE || 8002;
   app.listen(PORT, () => {

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const timetableRoutes = require('./routes/timetableRoutes');
 const connectMongo = require('./db/mongoClient');
+const checkJwt = require(`${process.env.NODE_PATH}/middleware/checkJwt`);
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,7 @@ app.use(express.json());
   const db = await connectMongo();
   app.locals.db = db;
 
-  app.use('/api/timetable', timetableRoutes);
+  app.use('/api/timetable', checkJwt, timetableRoutes);
 
   const PORT = process.env.PORT_TIMETABLE_SERVICE || 8005;
   app.listen(PORT, () => {

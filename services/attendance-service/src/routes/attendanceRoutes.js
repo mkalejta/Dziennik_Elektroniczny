@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const attendanceController = require('../controllers/attendanceController');
+const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', attendanceController.getAllAttendance);
 router.post('/', attendanceController.createAttendance);

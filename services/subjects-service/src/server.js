@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const subjectRoutes = require('./routes/subjectRoutes');
 const connectMongo = require('./db/mongoClient');
+const checkJwt = require(`${process.env.NODE_PATH}/middleware/checkJwt`);
 
 const app = express();
 app.use(express.json());
@@ -10,7 +11,7 @@ app.use(express.json());
   const db = await connectMongo();
   app.locals.db = db;
 
-  app.use('/api/subjects', subjectRoutes);
+  app.use('/api/subjects', checkJwt, subjectRoutes);
 
   const PORT = process.env.PORT_SUBJECTS_SERVICE || 8003;
   app.listen(PORT, () => {
