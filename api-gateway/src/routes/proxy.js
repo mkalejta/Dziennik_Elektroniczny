@@ -14,9 +14,6 @@ const serviceMap = {
     '/classes': 'http://classes-service:8007',
 };
 
-console.log(Object.keys(serviceMap));
-
-
 Object.keys(serviceMap).forEach((path) => {
     router.use(
         `${path}`,
@@ -25,9 +22,11 @@ Object.keys(serviceMap).forEach((path) => {
             target: serviceMap[path],
             changeOrigin: true,
             onProxyReq: (proxyReq, req) => {
-                const token = req.cookies['access_token'];
-                if (token) {
-                    proxyReq.setHeader('Authorization', `Bearer ${token}`);
+                if (req.body && typeof req.body === 'object') {
+                    const bodyData = JSON.stringify(req.body);
+                    proxyReq.setHeader('Content-Type', 'application/json');
+                    proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                    proxyReq.write(bodyData);
                 }
             },
         })

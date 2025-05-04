@@ -4,7 +4,7 @@ const pgClient = require('../db/pgClient');
 async function getAllUsers(req, res) {
     try {
         const db = req.app.locals.db;
-        const users = await db.collection('users').find().toArray();
+        const users = await db.collection('users').find().project({ password: 0 }).toArray();
         res.json(users.map(user => new User(user)));
     } catch (error) {
         console.error(error);
@@ -32,7 +32,7 @@ async function getSpecificUser(req, res) {
     try {
         const db = req.app.locals.db;
         const userId = req.params.id;
-        const user = await db.collection('users').findOne({ _id: userId });
+        const user = await db.collection('users').findOne({ _id: userId }, { projection: { password: 0 } });
 
         if (!user) {
             return res.status(404).send('User not found');

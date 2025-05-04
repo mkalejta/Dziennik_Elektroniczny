@@ -9,7 +9,7 @@ function validateClassId(classId) {
   if (typeof classId !== 'string') {
     throw new Error('Class ID must be a string');
   }
-  if (!/^[1-8]{1}[A-F]{1}$/.test(classId)) {
+  if (!/^[1-4]{1}[A-D]{1}$/.test(classId)) {
     throw new Error('Class ID must consist of 1 number and 1 uppercase letter');
   }
 }
