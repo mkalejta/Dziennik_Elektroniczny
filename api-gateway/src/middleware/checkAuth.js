@@ -49,7 +49,6 @@ export async function checkAuth(req, res, next) {
             return next();
         }
 
-        // Jeśli token wygasł, następuje próba odświeżenia go
         if (err.name === 'TokenExpiredError') {
             const refreshToken = req.cookies['refresh_token'];
             if (!refreshToken) return res.status(401).json({ message: 'Brak refresh tokenu' });
@@ -78,8 +77,8 @@ export async function checkAuth(req, res, next) {
                     secure: false,
                 });
 
-                jwt.verify(data.access_token, getKey, { 
-                    audience: 'gradebook-realm',
+                jwt.verify(data.access_token, getKey, {
+                    audience: 'frontend-client',
                     issuer: `${KEYCLOAK_PUBLIC_URL}/realms/${KEYCLOAK_REALM}`,
                     algorithms: ['RS256']
                 }, (verifyErr, decodedNew) => {

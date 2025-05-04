@@ -55,12 +55,14 @@ export async function handleRedirect(req, res) {
       httpOnly: true,
       sameSite: 'Lax',
       secure: false,
+      expiresIn: new Date(Date.now() + 15 * 60 * 1000), // 15 minut
     });
 
     res.cookie('refresh_token', data.refresh_token, {
       httpOnly: true,
       sameSite: 'Lax',
       secure: false,
+      expiresIn: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 dni
     });
 
     res.send(`<h2>Uwierzytelniono poprawnie!</h2><p>Możesz teraz korzystać z aplikacji.</p>`);

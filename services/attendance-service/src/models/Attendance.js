@@ -10,19 +10,14 @@ class Attendance {
     }
 
     static validate(attendance) {
-        if (!attendance.teacherId || !(attendance.teacherId instanceof ObjectId)) {
+        if (!attendance.teacherId || typeof attendance.teacherId !== 'string') {
             throw new Error('Invalid or missing "teacherId"');
         }
         if (
             !Array.isArray(attendance.students) ||
-            !attendance.students.every(student =>
-                student.studentId instanceof ObjectId && typeof student.present === 'boolean'
-            )
+            !attendance.students.every(studentId => typeof studentId === 'string')
         ) {
-            throw new Error('Invalid or missing "students" (must be an array of objects with "studentId" and "present")');
-        }
-        if (!attendance.date || isNaN(Date.parse(attendance.date))) {
-            throw new Error('Invalid or missing "date"');
+            throw new Error('Invalid or missing "students" (must be an array of string IDs)');
         }
         if (!attendance.subjectId || typeof attendance.subjectId !== 'string') {
             throw new Error('Invalid or missing "subjectId"');

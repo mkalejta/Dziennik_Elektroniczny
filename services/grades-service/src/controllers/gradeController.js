@@ -1,5 +1,4 @@
 const pgClient = require('../db/pgClient');
-const { get } = require('../routes/gradeRoutes');
 
 // Funkcja walidująca dane oceny
 function validateGradeData(gradeData) {
@@ -21,6 +20,16 @@ function validateGradeData(gradeData) {
 }
 
 
+async function getAllGrades(req, res) {
+    try {
+        const result = await pgClient.query('SELECT * FROM grades');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Błąd przy pobieraniu ocen:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 async function createGrade(req, res) {
     const gradeData = req.body;
 
@@ -41,7 +50,7 @@ async function createGrade(req, res) {
 }
 
 async function getGradeById(req, res) {
-    const gradeId = req.params.id;
+    const gradeId = req.params.gradeId;
 
     try {
         const result = await pgClient.query(
@@ -61,7 +70,7 @@ async function getGradeById(req, res) {
 }
 
 async function updateGrade(req, res) {
-    const gradeId = req.params.id;
+    const gradeId = req.params.gradeId;
     const gradeData = req.body;
 
     try {
@@ -85,7 +94,7 @@ async function updateGrade(req, res) {
 }
 
 async function deleteGrade(req, res) {
-    const gradeId = req.params.id;
+    const gradeId = req.params.gradeId;
 
     try {
         const result = await pgClient.query('DELETE FROM grades WHERE id = $1', [gradeId]);
@@ -124,6 +133,7 @@ async function getGradesByStudentIdAndSubjectId(req, res) {
 
 
 module.exports = {
+    getAllGrades,
     createGrade,
     getGradeById,
     updateGrade,

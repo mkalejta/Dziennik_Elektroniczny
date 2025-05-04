@@ -1,6 +1,9 @@
 const pgClient = require('../db/pgClient');
 
 function validateSubject(subjectData) {
+    if (!subjectData.subject_id || typeof subjectData.subject_id !== 'string') {
+        throw new Error('Invalid or missing "subject_id"');
+    }
     if (!subjectData.name || typeof subjectData.name !== 'string') {
         throw new Error('Invalid or missing "name"');
     }
@@ -30,8 +33,8 @@ async function createSubject(req, res) {
 
         const result = await pgClient.query(
             `INSERT INTO subjects (id, name, class_id, teacher_id) 
-             VALUES (gen_random_uuid(), $1, $2, $3) RETURNING *`,
-            [subjectData.name, subjectData.class_id, subjectData.teacher_id]
+             VALUES ($1, $2, $3, $4) RETURNING *`,
+            [subjectData.subject_id, subjectData.name, subjectData.class_id, subjectData.teacher_id]
         );
 
         res.status(201).json(result.rows[0]);

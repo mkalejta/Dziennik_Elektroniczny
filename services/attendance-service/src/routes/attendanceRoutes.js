@@ -5,6 +5,7 @@ const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', attendanceController.getAllAttendance);
 router.post('/', attendanceController.createAttendance);
+router.get('/:id', attendanceController.getAttendanceById);
 router.put('/:id', attendanceController.updateAttendance);
 router.delete('/:id', attendanceController.deleteAttendance);
 router.get('/student/:studentId', attendanceController.getAttendanceByStudentId);
