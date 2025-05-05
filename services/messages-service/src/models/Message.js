@@ -4,31 +4,21 @@ class Message {
   constructor({ 
     _id = new ObjectId(), 
     teacherId, 
-    studentId, 
+    parentId, 
     messages = [] 
   }) {
     this._id = _id;
     this.teacherId = teacherId;
-    this.studentId = studentId;
+    this.parentId = parentId;
     this.messages = messages;
   }
 
   static validate(message) {
-    if (!message.teacherId || !(message.teacherId instanceof ObjectId)) {
+    if (!message.teacherId || typeof message.teacherId !== 'string') {
       throw new Error('Invalid or missing "teacherId"');
     }
-    if (!message.studentId || !(message.studentId instanceof ObjectId)) {
-      throw new Error('Invalid or missing "studentId"');
-    }
-    if (
-      !Array.isArray(message.messages) || 
-      !message.messages.every(msg => 
-        msg.author instanceof ObjectId && 
-        typeof msg.content === 'string' && 
-        !isNaN(Date.parse(msg.sent))
-      )
-    ) {
-      throw new Error('Invalid or missing "messages" (must be an array of objects with "author", "content", and "sent")');
+    if (!message.parentId || typeof message.parentId !== 'string') {
+      throw new Error('Invalid or missing "parentId"');
     }
     return true;
   }

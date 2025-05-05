@@ -5,6 +5,7 @@ const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', timetableController.getAllTimetables);
 router.post('/', timetableController.createTimetable);
+router.get('/:id', timetableController.getTimetableById);
 router.put('/:id', timetableController.updateTimetable);
 router.delete('/:id', timetableController.deleteTimetable);
 router.get('/class/:classId', timetableController.getTimetableByClassId);

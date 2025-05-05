@@ -10,14 +10,14 @@ function validateTimetable(timetableData) {
     if (!timetableData.teacher_id || typeof timetableData.teacher_id !== 'string') {
         throw new Error('Invalid or missing "teacher_id"');
     }
-    if (!timetableData.day_of_week || typeof timetableData.day_of_week !== 'string') {
-        throw new Error('Invalid or missing "day_of_week"');
+    if (!timetableData.day || typeof timetableData.day !== 'string') {
+        throw new Error('Invalid or missing "day"');
     }
-    if (!timetableData.start_time || typeof timetableData.start_time !== 'string') {
-        throw new Error('Invalid or missing "start_time"');
+    if (!timetableData.start_at || typeof timetableData.start_at !== 'string') {
+        throw new Error('Invalid or missing "start_at"');
     }
-    if (!timetableData.end_time || typeof timetableData.end_time !== 'string') {
-        throw new Error('Invalid or missing "end_time"');
+    if (!timetableData.finish_at || typeof timetableData.finish_at !== 'string') {
+        throw new Error('Invalid or missing "finish_at"');
     }
 }
 
@@ -38,15 +38,15 @@ async function createTimetable(req, res) {
         validateTimetable(timetableData);
 
         const result = await pgClient.query(
-            `INSERT INTO timetable (id, class_id, subject_id, teacher_id, day_of_week, start_time, end_time) 
-             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6) RETURNING *`,
+            `INSERT INTO timetable (class_id, subject_id, teacher_id, day, start_at, finish_at) 
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
             [
                 timetableData.class_id,
                 timetableData.subject_id,
                 timetableData.teacher_id,
-                timetableData.day_of_week,
-                timetableData.start_time,
-                timetableData.end_time,
+                timetableData.day,
+                timetableData.start_at,
+                timetableData.finish_at,
             ]
         );
 
@@ -54,6 +54,26 @@ async function createTimetable(req, res) {
     } catch (error) {
         console.error('Błąd przy tworzeniu planu zajęć:', error);
         res.status(400).send(error.message);
+    }
+}
+
+async function getTimetableById(req, res) {
+    const timetableId = req.params.id;
+
+    try {
+        const result = await pgClient.query(
+            `SELECT * FROM timetable WHERE id = $1`,
+            [timetableId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).send('Timetable not found');
+        }
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Błąd przy pobieraniu planu zajęć:', error);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -66,15 +86,15 @@ async function updateTimetable(req, res) {
 
         const result = await pgClient.query(
             `UPDATE timetable SET class_id = $1, subject_id = $2, teacher_id = $3, 
-             day_of_week = $4, start_time = $5, end_time = $6 
+             day = $4, start_at = $5, finish_at = $6 
              WHERE id = $7 RETURNING *`,
             [
                 timetableData.class_id,
                 timetableData.subject_id,
                 timetableData.teacher_id,
-                timetableData.day_of_week,
-                timetableData.start_time,
-                timetableData.end_time,
+                timetableData.day,
+                timetableData.start_at,
+                timetableData.finish_at,
                 timetableId,
             ]
         );
@@ -130,6 +150,7 @@ async function getTimetableByClassId(req, res) {
 module.exports = {
     getAllTimetables,
     createTimetable,
+    getTimetableById,
     updateTimetable,
     deleteTimetable,
     getTimetableByClassId

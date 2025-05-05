@@ -15,6 +15,16 @@ function validateClassId(classId) {
 }
 
 
+async function getClasses(req, res) {
+  try {
+    const result = await pgClient.query('SELECT * FROM class ORDER BY id ASC');
+    res.json(result.rows.map(row => row.id));
+  } catch (error) {
+    console.error('Błąd przy pobieraniu klas:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 async function createClass(req, res) {
   const classData = req.body;
 
@@ -33,37 +43,11 @@ async function createClass(req, res) {
   }
 }
 
-async function getClasses(req, res) {
-  try {
-    const result = await pgClient.query('SELECT * FROM classes');
-    res.json(result.rows.map(row => row.id));
-  } catch (error) {
-    console.error('Błąd przy pobieraniu klas:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-}
-
-async function updateClass(req, res) {
-  const classId = req.params.classId;
-  const classData = req.body;
-
-  try {
-    await pgClient.query(
-      'UPDATE classes SET id = $1 WHERE id = $2',
-      [classData.id, classId]
-    );
-    res.status(204).send();
-  } catch (error) {
-    console.error('Błąd przy aktualizacji klasy:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-}
-
 async function deleteClass(req, res) {
   const classId = req.params.classId;
 
   try {
-    await pgClient.query('DELETE FROM classes WHERE id = $1', [classId]);
+    await pgClient.query('DELETE FROM class WHERE id = $1', [classId]);
     res.status(204).send();
   } catch (error) {
     console.error('Błąd przy usuwaniu klasy:', error);
@@ -76,10 +60,10 @@ async function getStudentsInClass(req, res) {
 
   try {
     const result = await pgClient.query(
-      'SELECT student_id FROM students_assignments WHERE class_id = $1',
+      'SELECT * FROM students_classes WHERE class_id = $1',
       [classId]
     );
-
+    
     const studentIds = result.rows.map(row => row.student_id);
 
     if (studentIds.length === 0) {
@@ -88,10 +72,8 @@ async function getStudentsInClass(req, res) {
     const db = req.app.locals.db;
     const usersCollection = db.collection('users');
 
-    const objectIds = studentIds.map(id => new ObjectId(id));
-
     const students = await usersCollection
-      .find({ _id: { $in: objectIds }, role: 'student' })
+      .find({ _id: { $in: studentIds }, role: 'student' })
       .project({ password: 0 }) // Nie zwracam haseł
       .toArray();
 
@@ -103,9 +85,8 @@ async function getStudentsInClass(req, res) {
 }
 
 module.exports = {
-  createClass,
   getClasses,
-  updateClass,
+  createClass,
   deleteClass,
   getStudentsInClass
 };
