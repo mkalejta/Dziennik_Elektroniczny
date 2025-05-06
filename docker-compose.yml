@@ -288,6 +288,26 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    
+  web-client:
+    build:
+      context: ./clients/web-client
+      dockerfile: Dockerfile
+    container_name: web-client
+    ports:
+      - "${PORT_WEB_CLIENT:-5173}:5173"
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
+      - VITE_KEYCLOAK_REALM=${VITE_KEYCLOAK_REALM}
+      - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
+      - VITE_PORT=5173
+    depends_on:
+      - api-gateway
+      - keycloak
+    networks:
+      - gradebook-net
+    restart: unless-stopped
 
 networks:
   gradebook-net:
