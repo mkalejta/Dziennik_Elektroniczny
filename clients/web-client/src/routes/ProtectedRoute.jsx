@@ -1,11 +1,14 @@
-import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { useKeycloak } from "@react-keycloak/web";
 
 export default function ProtectedRoute({ children, allowedRoles }) {
-  const { isAuthenticated, roles } = useAuth();
+  const { keycloak } = useKeycloak();
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (!roles.some(role => allowedRoles.includes(role))) return <Navigate to="/" />;
+  const isAuthenticated = keycloak.authenticated;
 
+  if (!isAuthenticated) {
+    keycloak.login({ redirectUri: window.location.origin });
+    return null;
+  }
+  
   return children;
 }

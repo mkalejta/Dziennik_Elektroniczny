@@ -17,7 +17,7 @@ const serviceMap = {
 Object.keys(serviceMap).forEach((path) => {
     router.use(
         `${path}`,
-        checkAuth,
+        // checkAuth,
         createProxyMiddleware({
             target: serviceMap[path],
             changeOrigin: true,

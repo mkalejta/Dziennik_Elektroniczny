@@ -115,16 +115,33 @@ async function getGradesByStudentIdAndSubjectId(req, res) {
     const subjectId = req.params.subjectId;
 
     try {
-        const result = await pgClient.query(
+        const gradesResult = await pgClient.query(
             `SELECT * FROM grades WHERE student_id = $1 AND subject_id = $2`,
             [studentId, subjectId]
         );
 
-        if (result.rowCount === 0) {
+        if (gradesResult.rowCount === 0) {
             return res.status(404).send('No grades found for this student and subject');
         }
 
-        res.json(result.rows);
+        const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
+        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s]));
+
+        const db = req.app.locals.db;
+
+        const result = await Promise.all(
+            gradesResult.rows.map(async (grade) => {
+                const teacher = await db.collection('users').findOne({ _id: grade.teacher_id });
+                return {
+                    id: grade.id,
+                    grade: grade.grade,
+                    subject: subjectsMap.get(grade.subject_id) || null,
+                    teacher: teacher || null
+                };
+            })
+        );
+
+        res.json(result);
     } catch (error) {
         console.error('Błąd przy pobieraniu ocen:', error);
         res.status(500).send('Internal server error');

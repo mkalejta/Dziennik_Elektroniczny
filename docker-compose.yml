@@ -55,8 +55,8 @@ services:
     depends_on:
       - keycloak_postgres
     volumes:
-     - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
      - keycloak_data:/opt/keycloak/data
+     - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     networks:
       - gradebook-net
     restart: unless-stopped
