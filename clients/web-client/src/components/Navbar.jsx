@@ -16,7 +16,7 @@ const parentFields = [
 
 const teacherFields = [
     { name: "profile", nav: "/profile" },
-    { name: "subjects", nav: "/subjects" },
+    { name: "grades", nav: "/add-grades" },
     { name: "attendance", nav: "/attendance" },
     { name: "timetable", nav: "/timetable" },
     { name: "messages", nav: "/messages" }
