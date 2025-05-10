@@ -91,8 +91,8 @@ async function getUserClass(req, res) {
     try {
         const result = await pgClient.query(
             `
-        SELECT c.id AS class_id, c.name AS class_name
-        FROM students_assignments sa
+        SELECT c.id AS class_id
+        FROM students_classes sa
         JOIN class c ON sa.class_id = c.id
         WHERE sa.student_id = $1
         `,

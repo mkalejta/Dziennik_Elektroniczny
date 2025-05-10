@@ -1,22 +1,123 @@
-import { DataGrid } from '@mui/x-data-grid';
+import { Box, Typography, Paper, CircularProgress } from "@mui/material";
+import useFetch from "../hooks/useFetch";
+import { useUser } from "../context/useUserContext";
+import React from "react";
 
-const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'subject', headerName: 'Subject', width: 130 },
-  { field: 'teacher', headerName: 'Teacher', width: 130 },
-  { field: 'time', headerName: 'Time', width: 150 },
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const hours = [
+  "08:00 - 08:45",
+  "09:00 - 09:45",
+  "10:00 - 10:45",
+  "11:00 - 11:45",
+  "12:00 - 12:45",
+  "13:00 - 13:45"
 ];
 
-const rows = [
-  { id: 1, subject: 'Math', teacher: 'Mr. Smith', time: '08:00 - 08:45' },
-  { id: 2, subject: 'Physics', teacher: 'Ms. Doe', time: '09:00 - 09:45' },
-  { id: 3, subject: 'English', teacher: 'Mr. Johnson', time: '10:00 - 10:45' },
-];
+export default function TimetableGrid() {
+  const { user } = useUser();
 
-export default function Timetable() {
+  const userData = useFetch(`${import.meta.env.VITE_API_URL}/users/${user?.username}/class`);
+  const classId = userData?.class_id;
+
+  const timetableData = useFetch(
+    classId ? `${import.meta.env.VITE_API_URL}/timetable/class/${classId}` : null
+  );
+
+  if (!userData || !timetableData) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Pomocnicza funkcja do sprawdzania, czy lekcja pasuje do pola
+  function getLessonAt(day, hour) {
+    const [start] = hour.split(" - ");
+    return timetableData.find(
+      (lesson) => lesson.day === day && lesson.start_at === start
+    );
+  }
+
+  console.log(timetableData);
+
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid rows={rows} columns={columns} pageSize={5} />
-    </div>
+    <Box sx={{ overflowX: "auto", p: 2 }}>
+      <Typography variant="h5" gutterBottom sx={{textAlign: "center"}}>
+        {classId} Timetable
+      </Typography>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "120px repeat(5, 1fr)",
+          gridAutoRows: "80px",
+          border: "1px solid #ccc",
+        }}
+      >
+        {/* Górny wiersz z dniami */}
+        <Box sx={{ border: "1px solid #ccc", backgroundColor: "#f0f0f0" }} />
+        {days.map((day) => (
+          <Box
+            key={day}
+            sx={{
+              border: "1px solid #ccc",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#f0f0f0",
+              fontWeight: "bold",
+            }}
+          >
+            {day}
+          </Box>
+        ))}
+
+        {/* Wiersze godzinowe */}
+        {hours.map((hour) => (
+          <React.Fragment key={hour}>
+            {/* Godzina lekcyjna */}
+            <Box
+              key={`hour-${hour}`}
+              sx={{
+                border: "1px solid #ccc",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              {hour}
+            </Box>
+
+            {/* Pola lekcji dla każdego dnia tygodnia */}
+            {days.map((day) => {
+              const lesson = getLessonAt(day, hour);
+              return (
+                <Box
+                  key={`${day}-${hour}`}
+                  sx={{
+                    border: "1px solid #ccc",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {lesson ? (
+                    <Paper elevation={1} sx={{ p: 1, width: "90%", textAlign: "center" }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        {lesson.subject}
+                      </Typography>
+                      <Typography variant="caption">{lesson.teacher}</Typography>
+                    </Paper>
+                  ) : null}
+                </Box>
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </Box>
+    </Box>
   );
 }

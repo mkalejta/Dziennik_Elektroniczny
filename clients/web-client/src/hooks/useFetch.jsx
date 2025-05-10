@@ -7,6 +7,7 @@ const useFetch = (url) => {
   const { keycloak } = useKeycloak();
 
   useEffect(() => {
+    if (!url) return;
     axios.get(url, {
         headers: {
           accept: 'application/json',

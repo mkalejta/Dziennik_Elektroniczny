@@ -23,7 +23,12 @@ function validateTimetable(timetableData) {
 
 async function getAllTimetables(req, res) {
     try {
-        const result = await pgClient.query('SELECT * FROM timetable');
+        const result = await pgClient.query(
+            `SELECT id, class_id, subject_id, teacher_id, day,
+                    TO_CHAR(start_at, 'HH24:MI') AS start_at,
+                    TO_CHAR(finish_at, 'HH24:MI') AS finish_at
+            FROM timetable`
+        );
         res.json(result.rows);
     } catch (error) {
         console.error('Błąd przy pobieraniu planu zajęć:', error);
@@ -62,7 +67,11 @@ async function getTimetableById(req, res) {
 
     try {
         const result = await pgClient.query(
-            `SELECT * FROM timetable WHERE id = $1`,
+            `SELECT id, class_id, subject_id, teacher_id, day,
+                    TO_CHAR(start_at, 'HH24:MI') AS start_at,
+                    TO_CHAR(finish_at, 'HH24:MI') AS finish_at
+            FROM timetable
+            WHERE id = $1`,
             [timetableId]
         );
 
@@ -131,16 +140,39 @@ async function getTimetableByClassId(req, res) {
     const classId = req.params.classId;
 
     try {
-        const result = await pgClient.query(
-            `SELECT * FROM timetable WHERE class_id = $1`,
+        const timetableResult = await pgClient.query(
+            `SELECT id, subject_id, teacher_id, day,
+                    TO_CHAR(start_at, 'HH24:MI') AS start_at,
+                    TO_CHAR(finish_at, 'HH24:MI') AS finish_at
+            FROM timetable
+            WHERE class_id = $1`,
             [classId]
         );
 
-        if (result.rowCount === 0) {
-            return res.status(404).send('Timetable not found for this class');
+        if (timetableResult.rowCount === 0) {
+            return res.status(404).send('No lessons found for this class');
         }
 
-        res.json(result.rows);
+        const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
+        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
+
+        const db = req.app.locals.db;
+
+        const result = await Promise.all(
+            timetableResult.rows.map(async (lesson) => {
+                const teacher = await db.collection('users').findOne({ _id: lesson.teacher_id });
+                return {
+                    id: lesson.id,
+                    subject: subjectsMap.get(lesson.subject_id) || null,
+                    teacher: teacher.name || null,
+                    day: lesson.day,
+                    start_at: lesson.start_at,
+                    finish_at: lesson.finish_at
+                };
+            })
+        );
+
+        res.json(result);
     } catch (error) {
         console.error('Błąd przy pobieraniu planu zajęć dla klasy:', error);
         res.status(500).send('Internal server error');
