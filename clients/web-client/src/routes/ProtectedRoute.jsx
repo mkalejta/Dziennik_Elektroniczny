@@ -1,7 +1,6 @@
 import { useKeycloak } from "@react-keycloak/web";
 import { Navigate } from 'react';
 import { useUser } from "../context/useUserContext";
-import Navbar from "../components/Navbar";
 
 export default function ProtectedRoute({ children, allowedRoles }) {
   const { keycloak } = useKeycloak();
@@ -22,7 +21,6 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
   
   return <> 
-    <Navbar/>
     {children}
   </>
 }
