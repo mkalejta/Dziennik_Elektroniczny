@@ -5,7 +5,7 @@ async function getAllMessages(req, res) {
     try {
         const db = req.app.locals.db;
         const messages = await db.collection('messages').find().toArray();
-        res.json(messages.map(message => new Message(message)));
+        res.json(messages);
     } catch (error) {
         console.error(error);
         res.status(500).send('Server error');

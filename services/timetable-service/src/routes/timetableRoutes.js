@@ -9,5 +9,6 @@ router.get('/:id', timetableController.getTimetableById);
 router.put('/:id', timetableController.updateTimetable);
 router.delete('/:id', timetableController.deleteTimetable);
 router.get('/class/:classId', timetableController.getTimetableByClassId);
+router.get("/teacher/:teacherId", timetableController.getTimetableByTeacherId);
 
 module.exports = router;

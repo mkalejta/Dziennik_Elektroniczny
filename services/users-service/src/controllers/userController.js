@@ -4,7 +4,7 @@ const pgClient = require('../db/pgClient');
 async function getAllUsers(req, res) {
     try {
         const db = req.app.locals.db;
-        const users = await db.collection('users').find().project({ password: 0 }).toArray();
+        const users = await db.collection('users').find().toArray();
         res.json(users.map(user => new User(user)));
     } catch (error) {
         console.error(error);
@@ -12,58 +12,45 @@ async function getAllUsers(req, res) {
     }
 }
 
-async function createUser(req, res) {
+async function addUserFromKeycloak(req, res) {
+    const event = req.body;
+
     try {
-        const db = req.app.locals.db;
-        const userData = req.body;
+        // Obsługa zdarzeń rejestracji użytkownika
+        if (event.type === 'REGISTER') {
+            const db = req.app.locals.db;
 
-        User.validate(userData);
-        const user = new User(userData);
+            // Dodaj użytkownika do MongoDB
+            await db.collection('users').insertOne({
+                _id: event.userId,
+                name: event.details.firstName,
+                surname: event.details.lastName,
+                role: event.details.role,
+            });
+        }
 
-        await db.collection('users').insertOne(user);
-        res.status(201).json(user);
+        res.status(200).send('Event processed');
     } catch (error) {
-        console.error(error);
-        res.status(400).send(error.message);
+        console.error('Error processing Keycloak event:', error);
+        res.status(500).send('Internal server error');
     }
 }
 
-async function getSpecificUser(req, res) {
+async function getUser(req, res) {
+    const userId = req.params.id;
+
     try {
         const db = req.app.locals.db;
-        const userId = req.params.id;
-        const user = await db.collection('users').findOne({ _id: userId }, { projection: { password: 0 } });
+        const user = await db.collection('users').findOne({ _id: userId });
 
         if (!user) {
             return res.status(404).send('User not found');
         }
 
-        res.json(new User(user));
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Server error');
-    }
-}
-
-async function updateUser(req, res) {
-    try {
-        const db = req.app.locals.db;
-        const userId = req.params.id;
-        const userData = req.body;
-
-        User.validate(userData);
-        const user = new User(userData);
-
-        const result = await db.collection('users').updateOne({ _id: userId }, { $set: user });
-
-        if (result.matchedCount === 0) {
-            return res.status(404).send('User not found');
-        }
-
         res.json(user);
     } catch (error) {
-        console.error(error);
-        res.status(400).send(error.message);
+        console.error('Error fetching user:', error);
+        res.status(500).send('Internal server error');
     }
 }
 
@@ -110,12 +97,10 @@ async function getUserClass(req, res) {
     }
 }
 
-
 module.exports = {
     getAllUsers,
-    createUser,
-    getSpecificUser,
-    updateUser,
+    addUserFromKeycloak,
+    getUser,
     deleteUser,
-    getUserClass
+    getUserClass,
 };

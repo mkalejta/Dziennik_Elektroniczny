@@ -35,25 +35,22 @@ db.createCollection('users');
 
 // Admin
 db.users.insertOne({
-  _id: 'admin1', // Ustalony ID dla admina
-  name: 'Admin User',
-  email: 'admin@example.com',
+  _id: 'admin1',
+  name: 'Admin',
+  surname: 'User',
   role: 'admin',
-  password: generatePassword(),
-  createdAt: new Date(),
 });
 
 // Students
 const students = [];
 for (let i = 1; i <= 40; i++) {
-  const isMale = i <= 20; // Pierwsza połowa to mężczyźni, druga połowa to kobiety
+  const isMale = i <= 20;
+  const fullName = generateFullName(isMale).split(" ");
   students.push({
-    _id: `student${i}`, // Ustalony ID dla studentów
-    name: generateFullName(isMale),
-    email: `student${i}@example.com`,
+    _id: `student${i}`,
+    name: fullName[0],
+    surname: fullName[1],
     role: 'student',
-    password: generatePassword(),
-    createdAt: new Date(),
   });
 }
 db.users.insertMany(students);
@@ -61,79 +58,45 @@ db.users.insertMany(students);
 // Parents
 const parents = [];
 for (let i = 1; i <= 40; i++) {
-  const isMale = i <= 20; // Pierwsza połowa to mężczyźni, druga połowa to kobiety
+  const isMale = i <= 20;
+  const fullName = generateFullName(isMale).split(" ");
   parents.push({
-    _id: `parent${i}`, // Ustalony ID dla rodziców
-    name: generateFullName(isMale),
-    email: `parent${i}@example.com`,
+    _id: `parent${i}`,
+    name: fullName[0],
+    surname: fullName[1],
     role: 'parent',
-    password: generatePassword(),
-    createdAt: new Date(),
   });
 }
 db.users.insertMany(parents);
 
 // Teachers
 const teachers = [];
-for (let i = 1; i <= 12; i++) {
-  const isMale = i <= 6; // Pierwsza połowa to mężczyźni, druga połowa to kobiety
+for (let i = 1; i <= 20; i++) {
+  const isMale = i <= 10;
+  const fullName = generateFullName(isMale).split(" ");
   teachers.push({
-    _id: `teacher${i}`, // Ustalony ID dla nauczycieli
-    name: generateFullName(isMale),
-    email: `teacher${i}@example.com`,
+    _id: `teacher${i}`,
+    name: fullName[0],
+    surname: fullName[1],
     role: 'teacher',
-    password: generatePassword(),
-    createdAt: new Date(),
   });
 }
 db.users.insertMany(teachers);
 
 // ATTENDANCE COLLECTION
 db.createCollection('attendance');
-db.attendance.insertMany([
-  {
-    teacherId: teachers[0]._id,
-    students: [students[0]._id, students[1]._id],
-    date: new Date(),
-    subjectId: 'math',
-  },
-  {
-    teacherId: teachers[1]._id,
-    students: [students[2]._id, students[3]._id],
-    date: new Date(),
-    subjectId: 'physics',
-  },
-]);
 
 // MESSAGES COLLECTION
 db.createCollection('messages');
-db.messages.insertMany([
-  {
-    teacherId: teachers[0]._id,
-    parentId: parents[0]._id,
-    messages: [
-      {
-        author: teachers[0]._id,
-        content: 'Your child is doing great!',
-        sent: new Date(),
-      },
-      {
-        author: parents[0]._id,
-        content: 'Thank you for the update!',
-        sent: new Date(),
-      },
-    ],
-  },
-  {
-    teacherId: teachers[1]._id,
-    parentId: parents[1]._id,
-    messages: [
-      {
-        author: teachers[1]._id,
-        content: 'Your child needs to improve in math.',
-        sent: new Date(),
-      },
-    ],
-  },
-]);
 
+db.createCollection('parent_child');
+
+// Parent-Child
+const parentChildConnections = [];
+for (let i = 1; i <= 40; i++) {
+  parentChildConnections.push({
+    parentId: `parent${i}`,
+    childId: `student${i}`,
+  });
+}
+db.parent_child.insertMany(parentChildConnections);

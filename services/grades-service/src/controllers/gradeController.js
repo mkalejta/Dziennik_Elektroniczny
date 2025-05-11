@@ -110,22 +110,21 @@ async function deleteGrade(req, res) {
     }
 }
 
-async function getGradesByStudentIdAndSubjectId(req, res) {
+async function getGradesByStudentId(req, res) {
     const studentId = req.params.studentId;
-    const subjectId = req.params.subjectId;
 
     try {
         const gradesResult = await pgClient.query(
-            `SELECT * FROM grades WHERE student_id = $1 AND subject_id = $2`,
-            [studentId, subjectId]
+            `SELECT * FROM grades WHERE student_id = $1`,
+            [studentId]
         );
 
         if (gradesResult.rowCount === 0) {
-            return res.status(404).send('No grades found for this student and subject');
+            return res.status(404).send('No grades found for this student');
         }
 
         const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
-        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s]));
+        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
 
         const db = req.app.locals.db;
 
@@ -136,7 +135,7 @@ async function getGradesByStudentIdAndSubjectId(req, res) {
                     id: grade.id,
                     grade: grade.grade,
                     subject: subjectsMap.get(grade.subject_id) || null,
-                    teacher: teacher || null
+                    teacher: teacher.name || null
                 };
             })
         );
@@ -155,5 +154,5 @@ module.exports = {
     getGradeById,
     updateGrade,
     deleteGrade,
-    getGradesByStudentIdAndSubjectId
+    getGradesByStudentId
 };

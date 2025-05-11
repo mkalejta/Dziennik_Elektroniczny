@@ -1,6 +1,8 @@
 {
   "id" : "7751b28a-0cdb-4047-9051-1d0ea2dd68ac",
   "realm" : "gradebook",
+  "displayName" : "",
+  "displayNameHtml" : "Gradebook",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -27,13 +29,13 @@
   "oauth2DevicePollingInterval" : 5,
   "enabled" : true,
   "sslRequired" : "external",
-  "registrationAllowed" : false,
+  "registrationAllowed" : true,
   "registrationEmailAsUsername" : false,
   "rememberMe" : false,
   "verifyEmail" : false,
   "loginWithEmailAllowed" : true,
   "duplicateEmailsAllowed" : false,
-  "resetPasswordAllowed" : false,
+  "resetPasswordAllowed" : true,
   "editUsernameAllowed" : false,
   "bruteForceProtected" : false,
   "permanentLockout" : false,
@@ -476,6 +478,72 @@
     },
     "notBefore" : 0,
     "groups" : [ ]
+  }, {
+    "id" : "7cda5b8c-014a-456a-8351-f65bb9cf0125",
+    "createdTimestamp" : 1746713617481,
+    "username" : "student1",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "email" : "student1@gmail.com",
+    "credentials" : [ {
+      "id" : "8688dcc9-c4f0-4b9f-b7d2-4f9a8382e810",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1746713629928,
+      "secretData" : "{\"value\":\"TVJOwEob2IKtbXDX6I/fKoaFgjafDiDnjq63MfE5k8U=\",\"salt\":\"k/Ui+uFpMArQ3/M7rOBRIA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-gradebook", "student" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "0ff844e9-216b-45e8-a488-625cb80adb74",
+    "createdTimestamp" : 1746949990810,
+    "username" : "student42",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Mark",
+    "lastName" : "Ołszyn",
+    "email" : "markołszyn@gmail.com",
+    "credentials" : [ {
+      "id" : "93f2b9ee-1399-4953-868b-8a1196154f3f",
+      "type" : "password",
+      "createdDate" : 1746949990880,
+      "secretData" : "{\"value\":\"RdC2FzYs0DkDhHNl3onWjXIpsNs8jzN80oWjNEu1zz8=\",\"salt\":\"zgUlnO5GY/ffuemRisnRqQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-gradebook" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "a2dc2ea9-fc0c-45ec-a702-01ae175066b6",
+    "createdTimestamp" : 1746945034297,
+    "username" : "teacher1",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Piotr",
+    "lastName" : "Wójcik",
+    "email" : "teacher1@gmail.com",
+    "credentials" : [ {
+      "id" : "fbc4b2eb-a272-4173-be5e-3a71cf6ea8ac",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1746945052960,
+      "secretData" : "{\"value\":\"mS04ai/+2aZa9325w5AgtpnmTwUzlMbHh1i9ct0XDlc=\",\"salt\":\"/Adkgm8LjEnlfFIV0l0HtQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-gradebook", "teacher" ],
+    "notBefore" : 0,
+    "groups" : [ ]
   } ],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
@@ -621,7 +689,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "ivQZchAGExd8hsid2rkdNk4cnqdHGicl",
-    "redirectUris" : [ "http://localhost:8081/auth/redirect" ],
+    "redirectUris" : [ "http://localhost:8081/*" ],
     "webOrigins" : [ "http://localhost:8081" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -720,28 +788,7 @@
         "_id" : "32f3d5db-9bc6-45a9-8d97-867d3324d02b",
         "uris" : [ "/*" ]
       } ],
-      "policies" : [ {
-        "id" : "e8f44156-320b-4b50-9abd-72b9feef3581",
-        "name" : "Default Policy",
-        "description" : "A policy that grants access only for users within this realm",
-        "type" : "js",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "AFFIRMATIVE",
-        "config" : {
-          "code" : "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
-        }
-      }, {
-        "id" : "1587e8a9-f7cd-42cc-95a7-92604aee1db8",
-        "name" : "Default Permission",
-        "description" : "A permission that applies to the default resource type",
-        "type" : "resource",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
-        "config" : {
-          "defaultResourceType" : "urn:frontend-client:resources:default",
-          "applyPolicies" : "[\"Default Policy\"]"
-        }
-      } ],
+      "policies" : [ ],
       "scopes" : [ ],
       "decisionStrategy" : "UNANIMOUS"
     }
@@ -844,6 +891,7 @@
     "protocol" : "openid-connect",
     "attributes" : {
       "client.secret.creation.time" : "1746534325",
+      "login_theme" : "keycloak",
       "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false",
       "use.refresh.tokens" : "true",
@@ -2065,13 +2113,19 @@
   "dockerAuthenticationFlow" : "docker auth",
   "attributes" : {
     "cibaBackchannelTokenDeliveryMode" : "poll",
-    "cibaExpiresIn" : "120",
     "cibaAuthRequestedUserHint" : "login_hint",
-    "oauth2DeviceCodeLifespan" : "600",
     "oauth2DevicePollingInterval" : "5",
-    "parRequestUriLifespan" : "60",
+    "clientOfflineSessionMaxLifespan" : "0",
+    "clientSessionIdleTimeout" : "0",
+    "clientOfflineSessionIdleTimeout" : "0",
     "cibaInterval" : "5",
-    "realmReusableOtpCode" : "false"
+    "realmReusableOtpCode" : "false",
+    "cibaExpiresIn" : "120",
+    "oauth2DeviceCodeLifespan" : "600",
+    "parRequestUriLifespan" : "60",
+    "clientSessionMaxLifespan" : "0",
+    "frontendUrl" : "",
+    "acr.loa.map" : "{}"
   },
   "keycloakVersion" : "23.0.6",
   "userManagedAccessAllowed" : false,

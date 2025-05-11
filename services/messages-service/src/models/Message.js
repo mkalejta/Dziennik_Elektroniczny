@@ -3,13 +3,13 @@ const { ObjectId } = require('mongodb');
 class Message {
   constructor({ 
     _id = new ObjectId(), 
-    teacherId, 
-    parentId, 
+    teacherId,
+    personId, 
     messages = [] 
   }) {
     this._id = _id;
     this.teacherId = teacherId;
-    this.parentId = parentId;
+    this.personId = personId;
     this.messages = messages;
   }
 
@@ -17,8 +17,8 @@ class Message {
     if (!message.teacherId || typeof message.teacherId !== 'string') {
       throw new Error('Invalid or missing "teacherId"');
     }
-    if (!message.parentId || typeof message.parentId !== 'string') {
-      throw new Error('Invalid or missing "parentId"');
+    if (!message.personId || typeof message.personId !== 'string') {
+      throw new Error('Invalid or missing "personId"');
     }
     return true;
   }

@@ -3,7 +3,7 @@ import useFetch from "../hooks/useFetch";
 import { useUser } from "../context/useUserContext";
 import React from "react";
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"];
 const hours = [
   "08:00 - 08:45",
   "09:00 - 09:45",
@@ -16,17 +16,33 @@ const hours = [
 export default function TimetableGrid() {
   const { user } = useUser();
 
-  const userData = useFetch(`${import.meta.env.VITE_API_URL}/users/${user?.username}/class`);
+  const userData = useFetch(
+    user?.role === "student"
+      ? `${import.meta.env.VITE_API_URL}/users/${user?.username}/class`
+      : null
+  );
   const classId = userData?.class_id;
 
   const timetableData = useFetch(
-    classId ? `${import.meta.env.VITE_API_URL}/timetable/class/${classId}` : null
+    user?.role === "student"
+      ? classId
+        ? `${import.meta.env.VITE_API_URL}/timetable/class/${classId}`
+        : null
+      : `${import.meta.env.VITE_API_URL}/timetable/teacher/${user?.username}`
   );
 
-  if (!userData || !timetableData) {
+  if (!timetableData) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (timetableData.length === 0) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Typography variant="h6">Tutaj niedługo pojawi się plan lekcji</Typography>
       </Box>
     );
   }
@@ -39,12 +55,10 @@ export default function TimetableGrid() {
     );
   }
 
-  console.log(timetableData);
-
   return (
     <Box sx={{ overflowX: "auto", p: 2 }}>
       <Typography variant="h5" gutterBottom sx={{textAlign: "center"}}>
-        {classId} Timetable
+        {user?.role === "student" ? `Plan lekcji dla klasy ${classId}` : "Twój plan lekcji"}
       </Typography>
 
       <Box

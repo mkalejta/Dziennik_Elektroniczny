@@ -149,28 +149,12 @@ async function getTimetableByClassId(req, res) {
             [classId]
         );
 
-        if (timetableResult.rowCount === 0) {
-            return res.status(404).send('No lessons found for this class');
-        }
-
         const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
         const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
 
         const db = req.app.locals.db;
 
-        const result = await Promise.all(
-            timetableResult.rows.map(async (lesson) => {
-                const teacher = await db.collection('users').findOne({ _id: lesson.teacher_id });
-                return {
-                    id: lesson.id,
-                    subject: subjectsMap.get(lesson.subject_id) || null,
-                    teacher: teacher.name || null,
-                    day: lesson.day,
-                    start_at: lesson.start_at,
-                    finish_at: lesson.finish_at
-                };
-            })
-        );
+        const result = await convertTimetable(timetableResult, subjectsMap, db);
 
         res.json(result);
     } catch (error) {
@@ -179,11 +163,56 @@ async function getTimetableByClassId(req, res) {
     }
 }
 
+async function getTimetableByTeacherId(req, res) {
+    const teacherId = req.params.teacherId;
+
+    try {
+        const timetableResult = await pgClient.query(
+            `SELECT id, class_id, subject_id, teacher_id, day,
+                    TO_CHAR(start_at, 'HH24:MI') AS start_at,
+                    TO_CHAR(finish_at, 'HH24:MI') AS finish_at
+            FROM timetable
+            WHERE teacher_id = $1`,
+            [teacherId]
+        );
+
+        const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
+        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
+
+        const db = req.app.locals.db;
+
+        const result = await convertTimetable(timetableResult, subjectsMap, db);
+        res.json(result);
+    } catch (error) {
+        console.error("Error fetching timetable for teacher:", error);
+        res.status(500).send("Internal server error");
+    }
+}
+
+async function convertTimetable(timetableResult, subjectsMap, db) {
+    const result = await Promise.all(
+        timetableResult.rows.map(async (lesson) => {
+            const teacher = await db.collection('users').findOne({ _id: lesson.teacher_id });
+            return {
+                id: lesson.id,
+                subject: subjectsMap.get(lesson.subject_id) || null,
+                teacher: teacher.name || null,
+                day: lesson.day,
+                start_at: lesson.start_at,
+                finish_at: lesson.finish_at
+            };
+        })
+    );
+
+    return result;
+}
+
 module.exports = {
     getAllTimetables,
     createTimetable,
     getTimetableById,
     updateTimetable,
     deleteTimetable,
-    getTimetableByClassId
+    getTimetableByClassId,
+    getTimetableByTeacherId
 };

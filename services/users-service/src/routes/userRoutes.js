@@ -4,9 +4,8 @@ const userController = require('../controllers/userController');
 const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', userController.getAllUsers);
-router.post('/', userController.createUser);
-router.get('/:id', userController.getSpecificUser);
-router.put('/:id', userController.updateUser);
+router.post('/keycloak-webhook', userController.addUserFromKeycloak);
+router.get('/:id', userController.getUser);
 router.delete('/:id', userController.deleteUser);
 router.get('/:id/class', userController.getUserClass);
 

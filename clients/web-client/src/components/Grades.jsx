@@ -1,25 +1,57 @@
 import { useUser } from "../context/useUserContext";
 import useFetch from "../hooks/useFetch";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 
 export default function Grades() {
     const { user } = useUser();
-    const data = useFetch(`${import.meta.env.VITE_API_URL}/grades/student/${user?.username}/subject/math`);
+    const data = useFetch(`${import.meta.env.VITE_API_URL}/grades/student/${user?.username}`);
 
-    return <>
-        <div>List of Student's Grades</div>
-        <div className="card">
-            <h3>Twoje oceny</h3>
-            <div className="card-body">
-                {data?.length > 0 && (
-                    <ul>
-                        {data.map((grade) => (
-                            <li key={grade.id}>
-                                {grade.subject.name}: {grade.grade} - {grade.teacher.name}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-        </div>
-    </>;
+    // Grupowanie ocen według przedmiotów
+    const groupedGrades = data?.reduce((acc, grade) => {
+        if (!acc[grade.subject]) {
+            acc[grade.subject] = [];
+        }
+        acc[grade.subject].push(grade);
+        return acc;
+    }, {});
+
+    return (
+        <Box sx={{ p: 3 }}>
+            <Typography variant="h4" gutterBottom sx={{ textAlign: "center" }}>
+                Twoje Oceny
+            </Typography>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ fontWeight: "bold" }}>Przedmiot</TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>Oceny</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {groupedGrades &&
+                            Object.entries(groupedGrades).map(([subject, grades]) => (
+                                <TableRow key={subject}>
+                                    <TableCell>{subject}</TableCell>
+                                    <TableCell>
+                                        {grades.map((grade) => (
+                                            <Box key={grade.id} sx={{ display: "inline-block", mx: 1 }}>
+                                                <Paper elevation={2} sx={{ p: 1, textAlign: "center" }}>
+                                                    <Typography variant="body2" fontWeight="bold">
+                                                        {grade.grade}
+                                                    </Typography>
+                                                    <Typography variant="caption">
+                                                        {grade.teacher.name}
+                                                    </Typography>
+                                                </Paper>
+                                            </Box>
+                                        ))}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
 }

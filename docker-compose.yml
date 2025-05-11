@@ -38,11 +38,20 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0.6
+    image: quay.io/keycloak/keycloak:24.0.1
     container_name: keycloak
-    command: ["start-dev", "--import-realm"]
+    command:
+      - start-dev
+      - --import-realm
+      - --features=scripts
+      - --spi-scripting-upload-scripts=enabled
     ports:
       - "${PORT_KEYCLOAK:-8080}:8080"
     environment:
@@ -52,11 +61,13 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak_postgres:5432/${KEYCLOAK_DB_NAME}
       - KC_DB_USERNAME=${KEYCLOAK_DB_USER}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+      - KC_EVENT_LISTENERS=http
+      - KC_EVENTS_HTTP_URIS=http://users-service:8001/api/users/keycloak-webhook
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     depends_on:
       - keycloak_postgres
-    volumes:
-     - keycloak_data:/opt/keycloak/data
-     - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -73,6 +84,12 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
   api-gateway:
     build:
@@ -270,7 +287,7 @@ services:
     ports:
       - "${PORT_CLASS_SERVICE:-8007}:8007"
     environment:
-      - PORT_MESSAGES_SERVICE=${PORT_CLASS_SERVICE:-8007}
+      - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE:-8007}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -310,11 +327,12 @@ services:
       - gradebook-net
     restart: unless-stopped
 
-networks:
-  gradebook-net:
-
 volumes:
   mongo_data:
   postgres_data:
   keycloak_data:
   keycloak_postgres_data:
+
+networks:
+  gradebook-net:
+    driver: bridge

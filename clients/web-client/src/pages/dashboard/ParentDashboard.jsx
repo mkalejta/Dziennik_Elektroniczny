@@ -6,6 +6,10 @@ import FreeCancellationIcon from '@mui/icons-material/FreeCancellation';
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MessageIcon from '@mui/icons-material/Message';
 import FieldsBar from '../../components/FieldsBar';
+import Attendance from '../../components/Attendance';
+import Grades from '../../components/Grades';
+import Messages from '../../components/Messages';
+import Profile from '../../components/Profile';
 
 const tabs = [
     { name: "attendance", label: "Attendance", icon: <FreeCancellationIcon /> },
@@ -22,10 +26,10 @@ export default function ParentDashboard() {
         <AppHeader />
         <FieldsBar tabs={tabs} setActiveTab={setActiveTab} activeTab={activeTab} />
         <Box sx={{ p: 2 }}>
-            {activeTab === "attendance" && <div>Attendance content</div>}
-            {activeTab === "grades" && <div>Grades content</div>}
-            {activeTab === "messages" && <div>Messages content</div>}
-            {activeTab === "profile" && <div>Profile content</div>}
+            {activeTab === "attendance" && <Attendance /> }
+            {activeTab === "grades" && <Grades /> }
+            {activeTab === "messages" && <Messages /> }
+            {activeTab === "profile" && <Profile /> }
         </Box>
     </>
   );
