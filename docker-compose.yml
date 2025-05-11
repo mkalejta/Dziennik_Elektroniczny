@@ -50,8 +50,6 @@ services:
     command:
       - start-dev
       - --import-realm
-      - --features=scripts
-      - --spi-scripting-upload-scripts=enabled
     ports:
       - "${PORT_KEYCLOAK:-8080}:8080"
     environment:
@@ -61,8 +59,6 @@ services:
       - KC_DB_URL=jdbc:postgresql://keycloak_postgres:5432/${KEYCLOAK_DB_NAME}
       - KC_DB_USERNAME=${KEYCLOAK_DB_USER}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
-      - KC_EVENT_LISTENERS=http
-      - KC_EVENTS_HTTP_URIS=http://users-service:8001/api/users/keycloak-webhook
     volumes:
       - keycloak_data:/opt/keycloak/data
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro

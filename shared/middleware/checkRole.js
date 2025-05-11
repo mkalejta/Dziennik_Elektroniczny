@@ -11,3 +11,5 @@ function checkRole(requiredRole) {
         next();
     };
 }
+
+module.exports = checkRole;

@@ -27,7 +27,7 @@ function App() {
           <ProtectedRoute allowedRoles={["parent"]}>
             <ParentDashboard />
           </ProtectedRoute>
-        } />     
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

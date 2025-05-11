@@ -1,5 +1,34 @@
 const User = require('../models/User');
 const pgClient = require('../db/pgClient');
+const axios = require('axios');
+
+function generateTemporaryPassword() {
+    return Math.random().toString(36).slice(-8);
+}
+
+async function getKeycloakAdminToken() {
+    const keycloakUrl = process.env.KEYCLOAK_INTERNAL_URL;
+    const clientId = process.env.KEYCLOAK_CLIENT_ID;
+    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
+    const realm = process.env.KEYCLOAK_REALM;
+
+    const response = await axios.post(
+        `${keycloakUrl}/realms/${realm}/protocol/openid-connect/token`,
+        new URLSearchParams({
+            grant_type: 'client_credentials',
+            client_id: clientId,
+            client_secret: clientSecret,
+        }),
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        }
+    );
+
+    return response.data.access_token;
+}
+
 
 async function getAllUsers(req, res) {
     try {
@@ -12,28 +41,73 @@ async function getAllUsers(req, res) {
     }
 }
 
-async function addUserFromKeycloak(req, res) {
-    const event = req.body;
+async function createUser(req, res) {
+    const { name, surname, username, role } = req.body;
 
     try {
-        // Obsługa zdarzeń rejestracji użytkownika
-        if (event.type === 'REGISTER') {
-            const db = req.app.locals.db;
 
-            // Dodaj użytkownika do MongoDB
-            await db.collection('users').insertOne({
-                _id: event.userId,
-                name: event.details.firstName,
-                surname: event.details.lastName,
-                role: event.details.role,
-            });
+        const temporaryPassword = await createKeycloakUser({ name, surname, email, username, role });
+
+        const db = req.app.locals.db;
+        const existingUser = await db.collection('users').findOne({ _id: username });
+
+        if (existingUser) {
+            return res.status(409).send('User already exists');
         }
 
-        res.status(200).send('Event processed');
+        if (!name || !surname || !username || !role) {
+            return res.status(400).send('Missing required fields');
+        }
+
+        await db.collection('users').insertOne({
+            _id: username,
+            name,
+            surname,
+            role,
+        });
+
+        res.status(201).json({ message: 'User created successfully', temporaryPassword });
     } catch (error) {
-        console.error('Error processing Keycloak event:', error);
+        console.error('Error creating user:', error);
         res.status(500).send('Internal server error');
     }
+}
+
+async function createKeycloakUser({ name, surname, email, username, role }) {
+    const keycloakUrl = process.env.KEYCLOAK_INTERNAL_URL;
+    const realm = process.env.KEYCLOAK_REALM;
+    const adminToken = await getKeycloakAdminToken();
+
+    const temporaryPassword = generateTemporaryPassword();
+
+    const userPayload = {
+        username,
+        email,
+        firstName: name,
+        lastName: surname,
+        enabled: true,
+        credentials: [
+            {
+                type: 'password',
+                value: temporaryPassword,
+                temporary: true,
+            },
+        ],
+        realmRoles: [role],
+    };
+
+    await axios.post(
+        `${keycloakUrl}/admin/realms/${realm}/users`,
+        userPayload,
+        {
+            headers: {
+                Authorization: `Bearer ${adminToken}`,
+                'Content-Type': 'application/json',
+            },
+        }
+    );
+
+    return temporaryPassword;
 }
 
 async function getUser(req, res) {
@@ -99,7 +173,7 @@ async function getUserClass(req, res) {
 
 module.exports = {
     getAllUsers,
-    addUserFromKeycloak,
+    createUser,
     getUser,
     deleteUser,
     getUserClass,
