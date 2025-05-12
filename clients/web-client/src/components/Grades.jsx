@@ -1,19 +1,13 @@
 import { useUser } from "../context/useUserContext";
 import useFetch from "../hooks/useFetch";
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import Loading from "./Loading";
 
 export default function Grades() {
     const { user } = useUser();
     const data = useFetch(`${import.meta.env.VITE_API_URL}/grades/student/${user?.username}`);
 
-    // Grupowanie ocen według przedmiotów
-    const groupedGrades = data?.reduce((acc, grade) => {
-        if (!acc[grade.subject]) {
-            acc[grade.subject] = [];
-        }
-        acc[grade.subject].push(grade);
-        return acc;
-    }, {});
+    if (!data) return <Loading />;
 
     return (
         <Box sx={{ p: 3 }}>
@@ -29,8 +23,8 @@ export default function Grades() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {groupedGrades &&
-                            Object.entries(groupedGrades).map(([subject, grades]) => (
+                        {data &&
+                            Object.entries(data).map(([subject, grades]) => (
                                 <TableRow key={subject}>
                                     <TableCell>{subject}</TableCell>
                                     <TableCell>

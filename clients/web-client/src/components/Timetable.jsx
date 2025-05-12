@@ -2,6 +2,7 @@ import { Box, Typography, Paper, CircularProgress } from "@mui/material";
 import useFetch from "../hooks/useFetch";
 import { useUser } from "../context/useUserContext";
 import React from "react";
+import Loading from "./Loading";
 
 const days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"];
 const hours = [
@@ -31,13 +32,7 @@ export default function TimetableGrid() {
       : `${import.meta.env.VITE_API_URL}/timetable/teacher/${user?.username}`
   );
 
-  if (!timetableData) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  if (!timetableData) return <Loading />;
 
   if (timetableData.length === 0) {
     return (

@@ -39,7 +39,7 @@ services:
       - gradebook-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -81,11 +81,10 @@ services:
       - gradebook-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "${KEYCLOAK_DB_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
-
 
   api-gateway:
     build:

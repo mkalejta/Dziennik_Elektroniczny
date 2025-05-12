@@ -3,16 +3,16 @@ import AppHeader from "../../components/AppHeader";
 import { Box } from '@mui/material';
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import FreeCancellationIcon from '@mui/icons-material/FreeCancellation';
 import FieldsBar from '../../components/FieldsBar';
 import Timetable from '../../components/Timetable';
 import Grades from '../../components/Grades';
-import Profile from '../../components/Profile';
+import Attendance from '../../components/Attendance';
 
 const tabs = [
   { name: "timetable", label: "Timetable", icon: <CalendarMonthIcon /> },
   { name: "grades", label: "Grades", icon: <DashboardIcon /> },
-  { name: "profile", label: "Profile", icon: <AccountCircleIcon /> },
+  { name: "attendance", label: "Attendance", icon: <FreeCancellationIcon /> },
 ];
 
 export default function StudentDashboard() {
@@ -25,7 +25,7 @@ export default function StudentDashboard() {
         <Box sx={{ p: 2 }}>
             {activeTab === "timetable" && <Timetable />}
             {activeTab === "grades" && <Grades />}
-            {activeTab === "profile" && <Profile />}
+            {activeTab === "attendance" && <Attendance />}
         </Box>
     </>
   );

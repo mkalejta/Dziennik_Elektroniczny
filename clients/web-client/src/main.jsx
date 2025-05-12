@@ -3,7 +3,7 @@ import App from "./App";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
 import Keycloak from "keycloak-js";
 import { UserProvider } from "./context/useUserProvider";
-import { Box, CircularProgress } from "@mui/material";
+import Loading from "./components/Loading";
 
 const keycloak = new Keycloak({
     url: import.meta.env.VITE_KEYCLOAK_URL,
@@ -22,10 +22,7 @@ const tokenLogger = (tokens) => {
 ReactDOM.createRoot(document.getElementById("root")).render(
   <ReactKeycloakProvider
     authClient={keycloak}
-    LoadingComponent={
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-      <CircularProgress />
-    </Box>}
+    LoadingComponent={<Loading />}
     autoRefreshToken={true}
     onTokens={tokenLogger}
     onEvent={eventLogger}

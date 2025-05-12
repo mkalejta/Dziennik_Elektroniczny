@@ -140,7 +140,16 @@ async function getGradesByStudentId(req, res) {
             })
         );
 
-        res.json(result);
+        // Grupowanie ocen według przedmiotów
+        const groupedGrades = result?.reduce((acc, grade) => {
+            if (!acc[grade.subject]) {
+                acc[grade.subject] = [];
+            }
+            acc[grade.subject].push(grade);
+            return acc;
+        }, {});
+
+        res.json(groupedGrades);
     } catch (error) {
         console.error('Błąd przy pobieraniu ocen:', error);
         res.status(500).send('Internal server error');
