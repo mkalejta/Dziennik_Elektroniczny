@@ -135,7 +135,13 @@ async function getAttendanceByParentId(req, res) {
         const parentChild = await db.collection('parent_child').find({ parentId }).toArray();
         const childIds = parentChild.map(pc => pc.childId);
 
-        const attendance = await db.collection('attendance').find({ students: { $nin: childIds } }).toArray();
+        const childId = childIds[0];
+        
+        if (!childId) {
+            return res.status(404).send('No children found for this parent');
+        }
+
+        const attendance = await db.collection('attendance').find({ students: { $ne: childId } }).toArray();
 
         const teacherIds = [...new Set(attendance.map(record => record.teacherId))];
         const teachers = await db.collection('users').find({ _id: { $in: teacherIds } }).toArray();

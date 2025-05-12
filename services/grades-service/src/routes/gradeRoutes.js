@@ -9,5 +9,7 @@ router.get('/:gradeId', gradeController.getGradeById);
 router.put('/:gradeId', gradeController.updateGrade);
 router.delete('/:gradeId', gradeController.deleteGrade);
 router.get('/student/:studentId', gradeController.getGradesByStudentId);
+router.get('/parent/:parentId', gradeController.getGradesByParentId);
+router.get('/student/:studentId/subject/:subjectId', gradeController.getGradesByStudentIdAndSubjectId);
 
 module.exports = router;

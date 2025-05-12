@@ -123,39 +123,92 @@ async function getGradesByStudentId(req, res) {
             return res.status(404).send('No grades found for this student');
         }
 
-        const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
-        const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
-
         const db = req.app.locals.db;
+        const result = await convertGrades(gradesResult, db);
 
-        const result = await Promise.all(
-            gradesResult.rows.map(async (grade) => {
-                const teacher = await db.collection('users').findOne({ _id: grade.teacher_id });
-                return {
-                    id: grade.id,
-                    grade: grade.grade,
-                    subject: subjectsMap.get(grade.subject_id) || null,
-                    teacher: teacher.name || null
-                };
-            })
-        );
-
-        // Grupowanie ocen według przedmiotów
-        const groupedGrades = result?.reduce((acc, grade) => {
-            if (!acc[grade.subject]) {
-                acc[grade.subject] = [];
-            }
-            acc[grade.subject].push(grade);
-            return acc;
-        }, {});
-
-        res.json(groupedGrades);
+        res.json(result);
     } catch (error) {
         console.error('Błąd przy pobieraniu ocen:', error);
         res.status(500).send('Internal server error');
     }
 }
 
+async function getGradesByParentId(req, res) {
+    try {
+        const db = req.app.locals.db;
+        const parentId = req.params.parentId;
+
+        const parentChild = await db.collection('parent_child').find({ parentId }).toArray();
+        const childIds = parentChild.map(pc => pc.childId);
+
+        const childId = childIds[0];
+
+        if (!childId) {
+            return res.status(404).send('No children found for this parent');
+        }
+
+        const gradesResult = await pgClient.query(
+            `SELECT * FROM grades WHERE student_id = $1`,
+            [childId]
+        );
+
+        if (gradesResult.rowCount === 0) {
+            return res.status(404).send('No grades found for this student');
+        }
+
+        const result = await convertGrades(gradesResult, db);
+
+        res.json(result);
+    } catch (error) {
+        console.error('Błąd przy pobieraniu ocen:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function getGradesByStudentIdAndSubjectId(req, res) {
+    const studentId = req.params.studentId;
+    const subjectId = req.params.subjectId;
+
+    try {
+        const gradesResult = await pgClient.query(
+            `SELECT * FROM grades WHERE student_id = $1 AND subject_id = $2`,
+            [studentId, subjectId]
+        );      
+
+        res.json(gradesResult.rows);
+    } catch (error) {
+        console.error('Błąd przy pobieraniu ocen:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
+async function convertGrades(gradesResult, db) {
+    const subjectsResult = await pgClient.query(`SELECT * FROM subjects`);
+    const subjectsMap = new Map(subjectsResult.rows.map(s => [s.id, s.name]));
+
+    const result = await Promise.all(
+        gradesResult.rows.map(async (grade) => {
+            const teacher = await db.collection('users').findOne({ _id: grade.teacher_id });
+            return {
+                id: grade.id,
+                grade: grade.grade,
+                subject: subjectsMap.get(grade.subject_id) || null,
+                teacher: teacher.name || null
+            };
+        })
+    );
+
+    // Grupowanie ocen według przedmiotów
+    const groupedGrades = result?.reduce((acc, grade) => {
+        if (!acc[grade.subject]) {
+            acc[grade.subject] = [];
+        }
+        acc[grade.subject].push(grade);
+        return acc;
+    }, {});
+
+    return groupedGrades;
+}
 
 module.exports = {
     getAllGrades,
@@ -163,5 +216,7 @@ module.exports = {
     getGradeById,
     updateGrade,
     deleteGrade,
-    getGradesByStudentId
+    getGradesByStudentId,
+    getGradesByParentId,
+    getGradesByStudentIdAndSubjectId
 };

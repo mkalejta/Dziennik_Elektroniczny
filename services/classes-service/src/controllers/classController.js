@@ -1,5 +1,4 @@
 const pgClient = require('../db/pgClient');
-const { ObjectId } = require('mongodb');
 
 // Funkcja walidująca id klasy
 function validateClassId(classId) {
@@ -13,7 +12,6 @@ function validateClassId(classId) {
     throw new Error('Class ID must consist of 1 number and 1 uppercase letter');
   }
 }
-
 
 async function getClasses(req, res) {
   try {
@@ -84,9 +82,35 @@ async function getStudentsInClass(req, res) {
   }
 }
 
+async function getClassesByTeacherId(req, res) {
+  const teacherId = req.params.teacherId;
+
+  try {
+    const result = await pgClient.query(
+      `SELECT c.id, s.name AS subject_name, s.id AS subject_id
+       FROM class c
+       JOIN subjects s ON c.id = s.class_id
+       WHERE s.teacher_id = $1`,
+      [teacherId]
+    );
+
+    const classes = result.rows.map(row => ({
+      id: row.id,
+      subjectId: row.subject_id,
+      subjectName: row.subject_name
+    }));
+
+    res.json(classes);
+  } catch (error) {
+    console.error('Błąd przy pobieraniu klas nauczyciela:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 module.exports = {
   getClasses,
   createClass,
   deleteClass,
-  getStudentsInClass
+  getStudentsInClass,
+  getClassesByTeacherId
 };

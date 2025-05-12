@@ -86,9 +86,30 @@ async function deleteSubject(req, res) {
     }
 }
 
+async function getSubjectByTeacherId(req, res) {
+    const teacherId = req.params.teacherId;
+
+    try {
+        const result = await pgClient.query(
+            `SELECT * FROM subjects WHERE teacher_id = $1`,
+            [teacherId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).send('Subject not found');
+        }
+
+        res.json(result.rows[0].id);
+    } catch (error) {
+        console.error('Błąd przy pobieraniu przedmiotu:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 module.exports = {
     getAllSubjects,
     createSubject,
     updateSubject,
-    deleteSubject
+    deleteSubject,
+    getSubjectByTeacherId,
 };

@@ -5,14 +5,18 @@ import Loading from "./Loading";
 
 export default function Grades() {
     const { user } = useUser();
-    const data = useFetch(`${import.meta.env.VITE_API_URL}/grades/student/${user?.username}`);
+    const data = useFetch(
+        user?.role === "student"
+        ? `${import.meta.env.VITE_API_URL}/grades/student/${user?.username}`
+        :`${import.meta.env.VITE_API_URL}/grades/parent/${user?.username}`
+    );
 
     if (!data) return <Loading />;
 
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom sx={{ textAlign: "center" }}>
-                Twoje Oceny
+                {user?.role === "student" ? 'Twoje Oceny' : 'Oceny Twojego Dziecka'}
             </Typography>
             <TableContainer component={Paper}>
                 <Table>
