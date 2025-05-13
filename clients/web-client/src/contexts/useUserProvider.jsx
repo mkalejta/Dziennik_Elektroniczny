@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useKeycloak } from "@react-keycloak/web";
 import { UserContext } from "./useUserContext";
 import { jwtDecode } from 'jwt-decode';
+import axios from "axios";
 
 export const UserProvider = ({ children }) => {
     const { keycloak } = useKeycloak();
@@ -14,10 +15,29 @@ export const UserProvider = ({ children }) => {
             const role = decodedToken.realm_access?.roles[0] || null;
 
             keycloak.loadUserProfile()
-                .then(profile => {
+                .then(async (profile) => {
+                    let classId = null;
+
+                    if (role === "student") {
+                        try {
+                            const response = await axios.get(
+                                `${import.meta.env.VITE_API_URL}/users/${profile.username}/class`,
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${keycloak.token}`,
+                                    },
+                                }
+                            );
+                            classId = response.data.class_id;
+                        } catch (err) {
+                            console.error("Failed to fetch classId", err);
+                        }
+                    }
                     setUser({
                         ...profile,
-                        role
+                        role,
+                        classId,
+                        token: keycloak.token
                     });
                 })
                 .catch(err => {

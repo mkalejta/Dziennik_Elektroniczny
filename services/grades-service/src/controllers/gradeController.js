@@ -120,7 +120,7 @@ async function getGradesByStudentId(req, res) {
         );
 
         if (gradesResult.rowCount === 0) {
-            return res.status(404).send('No grades found for this student');
+            return res.json([]);
         }
 
         const db = req.app.locals.db;
@@ -153,7 +153,7 @@ async function getGradesByParentId(req, res) {
         );
 
         if (gradesResult.rowCount === 0) {
-            return res.status(404).send('No grades found for this student');
+            return res.json([]);
         }
 
         const result = await convertGrades(gradesResult, db);

@@ -1,17 +1,14 @@
-import { useUser } from "../context/useUserContext";
-import useFetch from "../hooks/useFetch";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { useGrades } from "../contexts/GradesContext";
+import { Box, Typography, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import Loading from "./Loading";
+import { useUser } from "../contexts/useUserContext";
 
 export default function Grades() {
+    const { grades } = useGrades();
     const { user } = useUser();
-    const data = useFetch(
-        user?.role === "student"
-        ? `${import.meta.env.VITE_API_URL}/grades/student/${user?.username}`
-        :`${import.meta.env.VITE_API_URL}/grades/parent/${user?.username}`
-    );
 
-    if (!data) return <Loading />;
+    if (!grades) return <Loading />;
 
     return (
         <Box sx={{ p: 3 }}>
@@ -27,12 +24,12 @@ export default function Grades() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data &&
-                            Object.entries(data).map(([subject, grades]) => (
+                        {grades &&
+                            Object.entries(grades).map(([subject, _grades]) => (
                                 <TableRow key={subject}>
                                     <TableCell>{subject}</TableCell>
                                     <TableCell>
-                                        {grades.map((grade) => (
+                                        {_grades.map((grade) => (
                                             <Box key={grade.id} sx={{ display: "inline-block", mx: 1 }}>
                                                 <Paper elevation={2} sx={{ p: 1, textAlign: "center" }}>
                                                     <Typography variant="body2" fontWeight="bold">

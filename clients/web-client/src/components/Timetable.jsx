@@ -1,6 +1,6 @@
-import { Box, Typography, Paper, CircularProgress } from "@mui/material";
-import useFetch from "../hooks/useFetch";
-import { useUser } from "../context/useUserContext";
+import { Box, Typography, Paper } from "@mui/material";
+import { useTimetable } from "../contexts/TimetableContext";
+import { useUser } from "../contexts/useUserContext";
 import React from "react";
 import Loading from "./Loading";
 
@@ -15,26 +15,12 @@ const hours = [
 ];
 
 export default function TimetableGrid() {
+  const { timetable } = useTimetable();
   const { user } = useUser();
 
-  const userData = useFetch(
-    user?.role === "student"
-      ? `${import.meta.env.VITE_API_URL}/users/${user?.username}/class`
-      : null
-  );
-  const classId = userData?.class_id;
+  if (!timetable) return <Loading />;
 
-  const timetableData = useFetch(
-    user?.role === "student"
-      ? classId
-        ? `${import.meta.env.VITE_API_URL}/timetable/class/${classId}`
-        : null
-      : `${import.meta.env.VITE_API_URL}/timetable/teacher/${user?.username}`
-  );
-
-  if (!timetableData) return <Loading />;
-
-  if (timetableData.length === 0) {
+  if (timetable.length === 0) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
         <Typography variant="h6">Tutaj niedługo pojawi się plan lekcji</Typography>
@@ -45,7 +31,7 @@ export default function TimetableGrid() {
   // Pomocnicza funkcja do sprawdzania, czy lekcja pasuje do pola
   function getLessonAt(day, hour) {
     const [start] = hour.split(" - ");
-    return timetableData.find(
+    return timetable.find(
       (lesson) => lesson.day === day && lesson.start_at === start
     );
   }
@@ -53,7 +39,7 @@ export default function TimetableGrid() {
   return (
     <Box sx={{ overflowX: "auto", p: 2 }}>
       <Typography variant="h5" gutterBottom sx={{textAlign: "center"}}>
-        {user?.role === "student" ? `Plan lekcji dla klasy ${classId}` : "Twój plan lekcji"}
+        {user?.role === "student" ? `Plan lekcji dla klasy ${user.classId}` : "Twój plan lekcji"}
       </Typography>
 
       <Box
