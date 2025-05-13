@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import { useUser } from "./useUserContext";
+import { useUser } from "./UserContext";
 
 const GradesContext = createContext();
 

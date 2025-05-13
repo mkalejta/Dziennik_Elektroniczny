@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { useUser } from "./useUserContext";
+import { useUser } from "./UserContext";
 import useFetch from "../hooks/useFetch";
 
 const TeacherDataContext = createContext();
@@ -10,14 +10,20 @@ export function TeacherDataProvider({ children }) {
   const [students, setStudents] = useState({}); // Uczniowie w formacie { classId: [uczniowie] }
   const [grades, setGrades] = useState({}); // Oceny uczniów w formacie { studentId: [oceny] }
 
+  const attendance = useFetch(
+    user?.username && user?.role === "teacher"
+      ? `${import.meta.env.VITE_API_URL}/attendance/teacher/${user?.username}`
+      : null
+  );
+
   const subjectId = useFetch(
-    user?.username
+    user?.username && user?.role === "teacher" 
       ? `${import.meta.env.VITE_API_URL}/subjects/teacher/${user.username}`
       : null
   );
 
   const rawClasses = useFetch(
-    user?.username
+    user?.username && user?.role === "teacher"
       ? `${import.meta.env.VITE_API_URL}/classes/teacher/${user.username}`
       : null
   );
@@ -26,7 +32,7 @@ export function TeacherDataProvider({ children }) {
 
   useEffect(() => {
     const fetchStudentsAndGrades = async () => {
-      if (!user?.username || classes.length === 0) return;
+      if (user?.role !== "teacher" || !user?.username || classes.length === 0) return;
 
       try {
         const studentsByClass = {};
@@ -72,12 +78,14 @@ export function TeacherDataProvider({ children }) {
     };
 
     fetchStudentsAndGrades();
-  }, [user?.username, user?.token, classes, subjectId]);
+  }, [user?.username, user?.token, user?.role, classes, subjectId]);
 
   const addGrade = async (studentId, grade) => {
+    if (user?.role !== "teacher") return;
+
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/grades`,
+        `${import.meta.env.VITE_API_URL}/grades`, 
         {
           studentId,
           grade,
@@ -100,6 +108,9 @@ export function TeacherDataProvider({ children }) {
     }
   };
 
+  if (user?.role !== "teacher") {
+    return <>{children}</>;
+  }
   return (
     <TeacherDataContext.Provider
       value={{
@@ -108,6 +119,7 @@ export function TeacherDataProvider({ children }) {
         students,
         grades,
         addGrade,
+        attendance
       }}
     >
       {children}

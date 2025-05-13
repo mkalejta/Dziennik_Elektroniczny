@@ -1,6 +1,6 @@
 import { Box, Typography, Paper } from "@mui/material";
 import { useTimetable } from "../contexts/TimetableContext";
-import { useUser } from "../contexts/useUserContext";
+import { useUser } from "../contexts/UserContext";
 import React from "react";
 import Loading from "./Loading";
 

@@ -10,5 +10,6 @@ router.put('/:id', attendanceController.updateAttendance);
 router.delete('/:id', attendanceController.deleteAttendance);
 router.get('/student/:studentId', attendanceController.getAttendanceByStudentId);
 router.get('/parent/:parentId', attendanceController.getAttendanceByParentId);
+router.get('/teacher/:teacherId', attendanceController.getAttendanceByTeacherId);
 
 module.exports = router;

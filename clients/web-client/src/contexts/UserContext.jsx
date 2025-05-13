@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useKeycloak } from "@react-keycloak/web";
-import { UserContext } from "./useUserContext";
+import { useContext, createContext } from "react";
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
+
+const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const { keycloak } = useKeycloak();
@@ -55,3 +57,7 @@ export const UserProvider = ({ children }) => {
         </UserContext.Provider>
     );
 };
+
+export function useUser() {
+    return useContext(UserContext);
+}

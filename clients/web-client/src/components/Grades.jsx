@@ -2,7 +2,7 @@ import { useGrades } from "../contexts/GradesContext";
 import { Box, Typography, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import Loading from "./Loading";
-import { useUser } from "../contexts/useUserContext";
+import { useUser } from "../contexts/UserContext";
 
 export default function Grades() {
     const { grades } = useGrades();

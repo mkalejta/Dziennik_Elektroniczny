@@ -1,13 +1,12 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { ReactKeycloakProvider } from "@react-keycloak/web";
 import Keycloak from "keycloak-js";
-import { UserProvider } from "./contexts/useUserProvider";
 import Loading from "./components/Loading";
+import { UserProvider } from "./contexts/UserContext";
+import { ReactKeycloakProvider } from "@react-keycloak/web";
 import { GradesProvider } from "./contexts/GradesContext";
 import { AttendanceProvider } from "./contexts/AttendanceContext";
 import { TimetableProvider } from "./contexts/TimetableContext";
-import { AddAttendanceProvider } from "./contexts/AddAttendanceContext";
 import { TeacherDataProvider } from "./contexts/TeacherDataContext";
 
 const keycloak = new Keycloak({
@@ -36,11 +35,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <TimetableProvider>
         <AttendanceProvider>
           <GradesProvider>
-            <AddAttendanceProvider>
-              <TeacherDataProvider>
-                <App />
-              </TeacherDataProvider>
-            </AddAttendanceProvider>
+            <TeacherDataProvider>
+              <App />
+            </TeacherDataProvider>
           </GradesProvider>
         </AttendanceProvider>
       </TimetableProvider>

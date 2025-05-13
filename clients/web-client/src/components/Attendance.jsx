@@ -4,7 +4,6 @@ import { useAttendance } from "../contexts/AttendanceContext";
 
 export default function Attendance() {
     const { attendance } = useAttendance();
-    console.log(attendance);
 
     if (!attendance) return <Loading />;
 

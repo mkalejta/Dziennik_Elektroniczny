@@ -1,6 +1,6 @@
 import { useKeycloak } from "@react-keycloak/web";
 import { Navigate } from 'react';
-import { useUser } from "../contexts/useUserContext";
+import { useUser } from "../contexts/UserContext";
 
 export default function ProtectedRoute({ children, allowedRoles }) {
   const { keycloak } = useKeycloak();
