@@ -210,6 +210,97 @@ async function convertGrades(gradesResult, db) {
     return groupedGrades;
 }
 
+async function getGradesByTeacherIdGroupedByClass(req, res) {
+    const teacherId = req.params.teacherId;
+
+    try {
+        const db = req.app.locals.db;
+
+        // Pobierz przedmioty prowadzone przez nauczyciela
+        const subjectsResult = await pgClient.query(
+            `SELECT id, class_id FROM subjects WHERE teacher_id = $1`,
+            [teacherId]
+        );
+
+        const subjects = subjectsResult.rows;
+
+        if (subjects.length === 0) {
+            return res.json({});
+        }
+
+        // Mapowanie przedmiotów na klasy
+        const classSubjectMap = subjects.reduce((acc, subject) => {
+            if (!acc[subject.class_id]) {
+                acc[subject.class_id] = [];
+            }
+            acc[subject.class_id].push(subject.id);
+            return acc;
+        }, {});
+
+        // Pobierz wszystkich uczniów przypisanych do klas prowadzonych przez nauczyciela
+        const classIds = Object.keys(classSubjectMap);
+        const studentsClassesResult = await pgClient.query(
+            `SELECT student_id, class_id FROM students_classes WHERE class_id = ANY($1)`,
+            [classIds]
+        );
+
+        const studentsClasses = studentsClassesResult.rows;
+
+        // Pobierz dane uczniów z MongoDB na podstawie student_id
+        const studentIds = [...new Set(studentsClasses.map((sc) => sc.student_id))];
+        const students = await db
+            .collection("users")
+            .find({ _id: { $in: studentIds } })
+            .toArray();
+
+        // Pobierz oceny dla przedmiotów prowadzonych przez nauczyciela
+        const gradesResult = await pgClient.query(
+            `SELECT g.student_id, g.grade, g.subject_id, s.class_id
+             FROM grades g
+             JOIN subjects s ON g.subject_id = s.id
+             WHERE s.teacher_id = $1`,
+            [teacherId]
+        );
+
+        const grades = gradesResult.rows;
+
+        // Grupowanie uczniów według klas
+        const groupedData = classIds.reduce((acc, classId) => {
+            acc[classId] = studentsClasses
+                .filter((sc) => sc.class_id === classId)
+                .map((sc) => {
+                    const student = students.find((s) => s._id === sc.student_id);
+                    return {
+                        id: student?._id,
+                        name: student?.name,
+                        surname: student?.surname,
+                        grades: [], // Domyślnie pusta tablica ocen
+                    };
+                });
+            return acc;
+        }, {});
+
+        // Dopasowanie ocen do uczniów
+        grades.forEach((grade) => {
+            const classData = groupedData[grade.class_id];
+            if (!classData) return;
+
+            const studentData = classData.find((student) => student.id === grade.student_id);
+            if (!studentData) return;
+
+            // Dodaj ocenę tylko dla przedmiotów prowadzonych przez nauczyciela
+            if (classSubjectMap[grade.class_id].includes(grade.subject_id)) {
+                studentData.grades.push(grade.grade);
+            }
+        });
+
+        res.json(groupedData);
+    } catch (error) {
+        console.error("Błąd przy pobieraniu ocen nauczyciela:", error);
+        res.status(500).send("Internal server error");
+    }
+}
+
 module.exports = {
     getAllGrades,
     createGrade,
@@ -218,5 +309,6 @@ module.exports = {
     deleteGrade,
     getGradesByStudentId,
     getGradesByParentId,
-    getGradesByStudentIdAndSubjectId
+    getGradesByStudentIdAndSubjectId,
+    getGradesByTeacherIdGroupedByClass,
 };

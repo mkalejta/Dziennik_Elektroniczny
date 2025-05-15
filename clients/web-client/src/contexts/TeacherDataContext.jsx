@@ -7,8 +7,13 @@ const TeacherDataContext = createContext();
 
 export function TeacherDataProvider({ children }) {
   const { user } = useUser();
-  const [students, setStudents] = useState({}); // Uczniowie w formacie { classId: [uczniowie] }
-  const [grades, setGrades] = useState({}); // Oceny uczniów w formacie { studentId: [oceny] }
+  const [grades, setGrades] = useState(null);
+
+  const fetchedGrades = useFetch(
+    user?.username && user?.role === "teacher"
+      ? `${import.meta.env.VITE_API_URL}/grades/teacher/${user?.username}`
+      : null
+  );
 
   const attendance = useFetch(
     user?.username && user?.role === "teacher"
@@ -22,6 +27,12 @@ export function TeacherDataProvider({ children }) {
       : null
   );
 
+  useEffect(() => {
+    if (fetchedGrades) {
+      setGrades(fetchedGrades);
+    }
+  }, [fetchedGrades]);
+
   const rawClasses = useFetch(
     user?.username && user?.role === "teacher"
       ? `${import.meta.env.VITE_API_URL}/classes/teacher/${user.username}`
@@ -30,59 +41,7 @@ export function TeacherDataProvider({ children }) {
 
   const classes = useMemo(() => rawClasses || [], [rawClasses]);
 
-  useEffect(() => {
-    const fetchStudentsAndGrades = async () => {
-      if (user?.role !== "teacher" || !user?.username || classes.length === 0) return;
-
-      try {
-        const studentsByClass = {};
-        const gradesByStudent = {};
-
-        // Pobierz uczniów dla każdej klasy
-        for (const cls of classes) {
-          const studentsRes = await axios.get(
-            `${import.meta.env.VITE_API_URL}/classes/${cls.id}/students`,
-            {
-              headers: {
-                accept: 'application/json',
-                Authorization: `Bearer ${user?.token}`,
-              },
-            }
-          );
-          studentsByClass[cls.id] = studentsRes.data;
-        }
-
-        setStudents(studentsByClass);
-
-        // Pobierz oceny dla każdego ucznia
-        for (const classId in studentsByClass) {
-          for (const student of studentsByClass[classId]) {
-            const gradesRes = await axios.get(
-              `${import.meta.env.VITE_API_URL}/grades/student/${student._id}/subject/${subjectId}`,
-              {
-                headers: {
-                  accept: 'application/json',
-                  Authorization: `Bearer ${user?.token}`,
-                },
-              }
-            );
-
-            gradesByStudent[student._id] = gradesRes.data;
-          }
-        }
-
-        setGrades(gradesByStudent);
-      } catch (err) {
-        console.error("Failed to fetch students or grades", err);
-      }
-    };
-
-    fetchStudentsAndGrades();
-  }, [user?.username, user?.token, user?.role, classes, subjectId]);
-
   const addGrade = async (studentId, grade) => {
-    if (user?.role !== "teacher") return;
-
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/grades`, 
@@ -99,10 +58,27 @@ export function TeacherDataProvider({ children }) {
           },
         }
       );
-      setGrades((prev) => ({
-        ...prev,
-        [studentId]: [...(prev[studentId] || []), res.data],
-      }));
+      const newGrade = res.data;
+
+      setGrades((prev) => {
+        const classId = Object.keys(prev).find((classId) =>
+          prev[classId].some((student) => student.id === studentId)
+        );
+
+        if (!classId) return prev;
+
+        return {
+          ...prev,
+          [classId]: prev[classId].map((student) =>
+            student.id === studentId
+              ? {
+                  ...student,
+                  grades: [...student.grades, newGrade.grade],
+                }
+              : student
+          ),
+        };
+      });
     } catch (err) {
       console.error("Failed to add grade", err);
     }
@@ -115,11 +91,10 @@ export function TeacherDataProvider({ children }) {
     <TeacherDataContext.Provider
       value={{
         subjectId,
-        classes,
-        students,
         grades,
-        addGrade,
-        attendance
+        attendance,
+        classes,
+        addGrade
       }}
     >
       {children}

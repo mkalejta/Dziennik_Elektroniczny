@@ -3,7 +3,7 @@ import { Box, List, ListItemButton, ListItemText, Button, Typography, Divider, T
 import { useTeacherData } from "../contexts/TeacherDataContext";
 
 export default function AddGradesPanel() {
-  const { classes, students, grades, addGrade } = useTeacherData();
+  const { classes, grades, addGrade } = useTeacherData();
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newGrade, setNewGrade] = useState("");
@@ -20,7 +20,7 @@ export default function AddGradesPanel() {
     }
   };
 
-  const filteredStudents = students[selectedClass] || [];
+  const filteredStudents = grades[selectedClass] || [];
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -40,7 +40,7 @@ export default function AddGradesPanel() {
           ))}
         </List>
       </Box>
-
+      
       <Box sx={{ flex: 1, p: 2 }}>
         {selectedClass ? (
           <>
@@ -49,11 +49,11 @@ export default function AddGradesPanel() {
             </Typography>
             <List>
               {filteredStudents.map((student) => (
-                <Box key={student._id} sx={{ mb: 2 }}>
+                <Box key={student.id} sx={{ mb: 2 }}>
                   <ListItemButton
                     onClick={() =>
                       setSelectedStudent(
-                        selectedStudent === student._id ? null : student._id
+                        selectedStudent === student.id ? null : student.id
                       )
                     }
                   >
@@ -61,13 +61,13 @@ export default function AddGradesPanel() {
                       primary={`${student.name} ${student.surname}`}
                     />
                   </ListItemButton>
-                  {selectedStudent === student._id && (
+                  {selectedStudent === student.id && (
                     <Box sx={{ pl: 4 }}>
                       <Typography variant="subtitle1" gutterBottom>
                         Oceny:
                       </Typography>
                       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                        {(grades[student._id] || []).map((grade, index) => (
+                        {student.grades.map((grade, index) => (
                           <Paper
                             key={index}
                             sx={{
@@ -76,7 +76,7 @@ export default function AddGradesPanel() {
                               textAlign: "center",
                             }}
                           >
-                            {grade.grade}
+                            {grade}
                           </Paper>
                         ))}
                       </Box>

@@ -11,5 +11,6 @@ router.delete('/:gradeId', gradeController.deleteGrade);
 router.get('/student/:studentId', gradeController.getGradesByStudentId);
 router.get('/parent/:parentId', gradeController.getGradesByParentId);
 router.get('/student/:studentId/subject/:subjectId', gradeController.getGradesByStudentIdAndSubjectId);
+router.get('/teacher/:teacherId', gradeController.getGradesByTeacherIdGroupedByClass);
 
 module.exports = router;

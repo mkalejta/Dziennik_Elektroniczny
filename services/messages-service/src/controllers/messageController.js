@@ -28,7 +28,7 @@ async function createMessage(req, res) {
     }
 }
 
-async function getConversation(req, res) {
+async function getMessages(req, res) {
     try {
         const db = req.app.locals.db;
         const conversationId = req.params.conversationId;
@@ -45,7 +45,7 @@ async function getConversation(req, res) {
     }
 }
 
-async function updateConversation(req, res) {
+async function updateMessages(req, res) {
     try {
         const db = req.app.locals.db;
         const conversationId = req.params.conversationId;
@@ -77,9 +77,41 @@ async function updateConversation(req, res) {
     }
 }
 
+async function getMessagesByUserId(req, res) {
+    try {
+        const db = req.app.locals.db;
+        const userId = req.params.userId;
+        const messages = await db.collection('messages').find({ 'personId': userId }).toArray();
+
+        console.log('Messages for user:', messages);
+
+        res.json(messages);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+}
+
+async function getMessagesByTeacherId(req, res) {
+    try {
+        const db = req.app.locals.db;
+        const teacherId = req.params.teacherId;
+        const messages = await db.collection('messages').find({ 'teacherId': teacherId }).toArray();
+        if (!messages) {
+            return res.status(404).send('No messages found for this teacher');
+        }
+        res.json(messages);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server error');
+    }
+}
+
 module.exports = {
     getAllMessages,
     createMessage,
-    getConversation,
-    updateConversation
+    getMessages,
+    updateMessages,
+    getMessagesByUserId,
+    getMessagesByTeacherId
 };

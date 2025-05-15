@@ -8,6 +8,7 @@ import { GradesProvider } from "./contexts/GradesContext";
 import { AttendanceProvider } from "./contexts/AttendanceContext";
 import { TimetableProvider } from "./contexts/TimetableContext";
 import { TeacherDataProvider } from "./contexts/TeacherDataContext";
+import { MessagesProvider } from "./contexts/MessagesContext";
 
 const keycloak = new Keycloak({
     url: import.meta.env.VITE_KEYCLOAK_URL,
@@ -35,9 +36,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <TimetableProvider>
         <AttendanceProvider>
           <GradesProvider>
-            <TeacherDataProvider>
-              <App />
-            </TeacherDataProvider>
+            <MessagesProvider>
+              <TeacherDataProvider>
+                <App />
+              </TeacherDataProvider>
+            </MessagesProvider>
           </GradesProvider>
         </AttendanceProvider>
       </TimetableProvider>
