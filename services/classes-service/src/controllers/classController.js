@@ -86,21 +86,60 @@ async function getClassesByTeacherId(req, res) {
   const teacherId = req.params.teacherId;
 
   try {
+    // Klasy i przedmioty prowadzone przez nauczyciela
     const result = await pgClient.query(
-      `SELECT c.id, s.name AS subject_name, s.id AS subject_id
+      `SELECT c.id AS class_id, s.name AS subject_name, s.id AS subject_id
        FROM class c
        JOIN subjects s ON c.id = s.class_id
        WHERE s.teacher_id = $1`,
       [teacherId]
     );
 
-    const classes = result.rows.map(row => ({
-      id: row.id,
-      subjectId: row.subject_id,
-      subjectName: row.subject_name
+    const classes = result.rows;
+
+    if (classes.length === 0) {
+      return res.json([]);
+    }
+
+    const classIds = classes.map((cls) => cls.class_id);
+    const studentsClassesResult = await pgClient.query(
+      `SELECT student_id, class_id FROM students_classes WHERE class_id = ANY($1)`,
+      [classIds]
+    );
+
+    const studentsClasses = studentsClassesResult.rows;
+
+    const studentIds = [...new Set(studentsClasses.map((sc) => sc.student_id))];
+    const db = req.app.locals.db;
+    const usersCollection = db.collection('users');
+
+    const students = await usersCollection
+      .find({ _id: { $in: studentIds }, role: 'student' })
+      .project({ _id: 1, name: 1, surname: 1 })
+      .toArray();
+
+    // Grupowanie uczniów według klas
+    const studentsByClass = classIds.reduce((acc, classId) => {
+      acc[classId] = studentsClasses
+        .filter((sc) => sc.class_id === classId)
+        .map((sc) => {
+          const student = students.find((s) => s._id === sc.student_id);
+          return student
+            ? { id: student._id, name: student.name, surname: student.surname }
+            : null;
+        })
+        .filter(Boolean); // Usuń null, jeśli student nie został znaleziony
+      return acc;
+    }, {});
+
+    const classesWithStudents = classes.map((cls) => ({
+      id: cls.class_id,
+      subjectId: cls.subject_id,
+      subjectName: cls.subject_name,
+      students: studentsByClass[cls.class_id] || [],
     }));
 
-    res.json(classes);
+    res.json(classesWithStudents);
   } catch (error) {
     console.error('Błąd przy pobieraniu klas nauczyciela:', error);
     res.status(500).json({ error: 'Internal server error' });

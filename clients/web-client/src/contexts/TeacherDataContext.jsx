@@ -8,6 +8,7 @@ const TeacherDataContext = createContext();
 export function TeacherDataProvider({ children }) {
   const { user } = useUser();
   const [grades, setGrades] = useState(null);
+  const [attendance, setAttendance] = useState(null);
 
   const fetchedGrades = useFetch(
     user?.username && user?.role === "teacher"
@@ -15,17 +16,17 @@ export function TeacherDataProvider({ children }) {
       : null
   );
 
-  const attendance = useFetch(
+  const fetchedAttendance = useFetch(
     user?.username && user?.role === "teacher"
       ? `${import.meta.env.VITE_API_URL}/attendance/teacher/${user?.username}`
       : null
   );
 
-  const subjectId = useFetch(
-    user?.username && user?.role === "teacher" 
-      ? `${import.meta.env.VITE_API_URL}/subjects/teacher/${user.username}`
-      : null
-  );
+  useEffect(() => {
+    if (fetchedAttendance) {
+      setAttendance(fetchedAttendance);
+    }
+  }, [fetchedAttendance]);
 
   useEffect(() => {
     if (fetchedGrades) {
@@ -41,7 +42,7 @@ export function TeacherDataProvider({ children }) {
 
   const classes = useMemo(() => rawClasses || [], [rawClasses]);
 
-  const addGrade = async (studentId, grade) => {
+  const addGrade = async (studentId, grade, subjectId) => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/grades`, 
@@ -84,17 +85,65 @@ export function TeacherDataProvider({ children }) {
     }
   };
 
+  const addAttendance = async (attendanceData) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/attendance`,
+        attendanceData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const newAttendance = response.data;
+
+      setAttendance((prev) => {
+        return [...prev, newAttendance];
+      });
+    } catch (err) {
+      console.error("Failed to add attendance", err);
+    }
+  };
+
+  const editAttendance = async (attendanceId, updatedAttendance) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/attendance/${attendanceId}`,
+        updatedAttendance,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const updatedAttendanceData = response.data;
+      setAttendance((prev) => {
+        return prev.map((att) =>
+          att.id === attendanceId ? updatedAttendanceData : att
+        );
+      });
+    } catch (err) {
+      console.error("Failed to edit attendance", err);
+    }
+  };
+
   if (user?.role !== "teacher") {
     return <>{children}</>;
   }
   return (
     <TeacherDataContext.Provider
       value={{
-        subjectId,
         grades,
         attendance,
         classes,
-        addGrade
+        addGrade,
+        addAttendance,
+        editAttendance
       }}
     >
       {children}

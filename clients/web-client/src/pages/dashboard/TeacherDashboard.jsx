@@ -7,8 +7,8 @@ import ChecklistIcon from '@mui/icons-material/Checklist';
 import MessageIcon from '@mui/icons-material/Message';
 import FieldsBar from '../../components/FieldsBar';
 import Timetable from "../../components/Timetable";
-import AddAttendancePanel from "../../components/AddAttendancePanel";
-import AddGradesPanel from "../../components/AddGradesPanel";
+import AttendanceManager from "../../components/AttendanceManager";
+import GradesManager from "../../components/GradesManager";
 import Messages from "../../components/Messages";
 
 const tabs = [
@@ -27,8 +27,8 @@ export default function ParentDashboard() {
         <FieldsBar tabs={tabs} setActiveTab={setActiveTab} activeTab={activeTab} />
         <Box sx={{ p: 2 }}>
             {activeTab === "timetable" && <Timetable />}
-            {activeTab === "attendance" && <AddAttendancePanel />}
-            {activeTab === "add-grades" && <AddGradesPanel />}
+            {activeTab === "attendance" && <AttendanceManager />}
+            {activeTab === "add-grades" && <GradesManager />}
             {activeTab === "messages" && <Messages />}
         </Box>
     </>

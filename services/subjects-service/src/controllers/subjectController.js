@@ -96,10 +96,10 @@ async function getSubjectByTeacherId(req, res) {
         );
 
         if (result.rowCount === 0) {
-            return res.status(404).send('Subject not found');
+            return res.status(404).send('Subjects not found');
         }
 
-        res.json(result.rows[0].id);
+        res.json(result.rows);
     } catch (error) {
         console.error('Błąd przy pobieraniu przedmiotu:', error);
         res.status(500).send('Internal server error');

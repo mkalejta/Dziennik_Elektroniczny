@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Box, List, ListItemButton, ListItemText, Button, Typography, Divider, TextField, Paper } from "@mui/material";
 import { useTeacherData } from "../contexts/TeacherDataContext";
 
-export default function AddGradesPanel() {
-  const { classes, grades, addGrade } = useTeacherData();
+export default function GradesManager() {
+  const { classes, grades, subjectIds, addGrade } = useTeacherData();
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [newGrade, setNewGrade] = useState("");
@@ -15,7 +15,9 @@ export default function AddGradesPanel() {
 
   const handleAddGrade = () => {
     if (newGrade && selectedStudent) {
-      addGrade(selectedStudent, parseFloat(newGrade));
+      const subjectId = subjectIds.find((subject) => subject.class_id === selectedClass)?.id;
+      if (!subjectId) return;
+      addGrade(selectedStudent, parseFloat(newGrade), subjectId);
       setNewGrade("");
     }
   };

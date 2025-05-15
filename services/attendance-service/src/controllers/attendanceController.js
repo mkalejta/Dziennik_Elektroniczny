@@ -83,7 +83,9 @@ async function getAttendanceByStudentId(req, res) {
         const db = req.app.locals.db;
         const studentId = req.params.studentId;
 
-        const attendance = await db.collection('attendance').find({ students: { $ne: studentId } }).toArray();
+        const attendance = await db.collection('attendance').find({
+            students: { $elemMatch: { id: studentId, present: false } }
+        }).toArray();
 
         const result = await convertAttendance(attendance, db);
 
@@ -99,16 +101,17 @@ async function getAttendanceByParentId(req, res) {
         const db = req.app.locals.db;
         const parentId = req.params.parentId;
 
+        // Dzieci powiązane z rodzicem
         const parentChild = await db.collection('parent_child').find({ parentId }).toArray();
         const childIds = parentChild.map(pc => pc.childId);
 
-        const childId = childIds[0];
-        
-        if (!childId) {
+        if (childIds.length === 0) {
             return res.status(404).send('No children found for this parent');
         }
 
-        const attendance = await db.collection('attendance').find({ students: { $ne: childId } }).toArray();
+        const attendance = await db.collection('attendance').find({
+            students: { $elemMatch: { id: { $in: childIds }, present: false } }
+        }).toArray();
 
         const result = await convertAttendance(attendance, db);
 
@@ -123,6 +126,7 @@ async function getAttendanceByTeacherId(req, res) {
     try {
         const db = req.app.locals.db;
         const teacherId = req.params.teacherId;
+
         const attendance = await db.collection('attendance').find({ teacherId }).toArray();
 
         const subjectIds = [...new Set(attendance.map(record => record.subjectId))];
@@ -142,7 +146,7 @@ async function getAttendanceByTeacherId(req, res) {
             subjectId: record.subjectId,
             classId: subjectMap[record.subjectId]?.classId,
             date: record.date,
-            students: record.students
+            students: record.students,
         }));
 
         // Grupowanie według daty
