@@ -5,7 +5,7 @@ services:
     image: mongo:7.0
     container_name: mongodb
     ports:
-      - "${PORT_MONGO:-27017}:27017"
+      - "${PORT_MONGO}:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
@@ -17,7 +17,7 @@ services:
       - gradebook-net
     restart: unless-stopped
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -27,7 +27,7 @@ services:
     image: postgres:16
     container_name: postgres
     ports:
-      - "${PORT_POSTGRES:-5432}:5432"
+      - "${PORT_POSTGRES}:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -51,7 +51,7 @@ services:
       - start-dev
       - --import-realm
     ports:
-      - "${PORT_KEYCLOAK:-8080}:8080"
+      - "${PORT_KEYCLOAK}:8080"
     environment:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
@@ -92,16 +92,16 @@ services:
       dockerfile: Dockerfile
     container_name: api-gateway
     ports:
-      - "${PORT_API_GATEWAY:-8081}:8081"
+      - "${PORT_API_GATEWAY}:8081"
     environment:
-      - PORT_API_GATEWAY=${PORT_API_GATEWAY:-8081}
-      - PORT_USERS_SERVICE=${PORT_USERS_SERVICE:-8001}
-      - PORT_GRADES_SERVICE=${PORT_GRADES_SERVICE:-8002}
-      - PORT_SUBJECTS_SERVICE=${PORT_SUBJECTS_SERVICE:-8003}
-      - PORT_ATTENDANCE_SERVICE=${PORT_ATTENDANCE_SERVICE:-8004}
-      - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE:-8005}
-      - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE:-8006}
-      - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE:-8007}
+      - PORT_API_GATEWAY=${PORT_API_GATEWAY}
+      - PORT_USERS_SERVICE=${PORT_USERS_SERVICE}
+      - PORT_GRADES_SERVICE=${PORT_GRADES_SERVICE}
+      - PORT_SUBJECTS_SERVICE=${PORT_SUBJECTS_SERVICE}
+      - PORT_ATTENDANCE_SERVICE=${PORT_ATTENDANCE_SERVICE}
+      - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE}
+      - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE}
+      - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE}
     depends_on:
       - keycloak
     networks:
@@ -114,9 +114,9 @@ services:
       dockerfile: Dockerfile
     container_name: users-service
     ports:
-      - "${PORT_USERS_SERVICE:-8001}:8001"
+      - "${PORT_USERS_SERVICE}:8001"
     environment:
-      - PORT_USER_SERVICE=${PORT_USERS_SERVICE:-8001}
+      - PORT_USER_SERVICE=${PORT_USERS_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -142,9 +142,9 @@ services:
       dockerfile: Dockerfile
     container_name: grades-service
     ports:
-      - "${PORT_GRADES_SERVICE:-8002}:8002"
+      - "${PORT_GRADES_SERVICE}:8002"
     environment:
-      - PORT_GRADES_SERVICE=${PORT_GRADES_SERVICE:-8002}
+      - PORT_GRADES_SERVICE=${PORT_GRADES_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -170,9 +170,9 @@ services:
       dockerfile: Dockerfile
     container_name: subjects-service
     ports:
-      - "${PORT_SUBJECTS_SERVICE:-8003}:8003"
+      - "${PORT_SUBJECTS_SERVICE}:8003"
     environment:
-      - PORT_SUBJECT_SERVICE=${PORT_SUBJECTS_SERVICE:-8003}
+      - PORT_SUBJECT_SERVICE=${PORT_SUBJECTS_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -198,9 +198,9 @@ services:
       dockerfile: Dockerfile
     container_name: attendance-service
     ports:
-      - "${PORT_ATTENDANCE_SERVICE:-8004}:8004"
+      - "${PORT_ATTENDANCE_SERVICE}:8004"
     environment:
-      - PORT_ATTENDANCE_SERVICE=${PORT_ATTENDANCE_SERVICE:-8004}
+      - PORT_ATTENDANCE_SERVICE=${PORT_ATTENDANCE_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -226,9 +226,9 @@ services:
       dockerfile: Dockerfile
     container_name: timetable-service
     ports:
-      - "${PORT_TIMETABLE_SERVICE:-8005}:8005"
+      - "${PORT_TIMETABLE_SERVICE}:8005"
     environment:
-      - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE:-8005}
+      - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -254,9 +254,9 @@ services:
       dockerfile: Dockerfile
     container_name: messages-service
     ports:
-      - "${PORT_MESSAGES_SERVICE:-8006}:8006"
+      - "${PORT_MESSAGES_SERVICE}:8006"
     environment:
-      - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE:-8006}
+      - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -282,9 +282,9 @@ services:
       dockerfile: Dockerfile
     container_name: classes-service
     ports:
-      - "${PORT_CLASS_SERVICE:-8007}:8007"
+      - "${PORT_CLASS_SERVICE}:8007"
     environment:
-      - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE:-8007}
+      - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE}
       - MONGO_URI=${MONGO_URI}
       - MONGO_DB_NAME=${MONGO_DB_NAME}
       - NODE_PATH=${NODE_PATH}
@@ -310,7 +310,7 @@ services:
       dockerfile: Dockerfile
     container_name: web-client
     ports:
-      - "${PORT_WEB_CLIENT:-5173}:5173"
+      - "${PORT_WEB_CLIENT}:5173"
     environment:
       - VITE_API_URL=${VITE_API_URL}
       - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
@@ -323,6 +323,26 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+
+  admin-panel:
+    build:
+      context: ./clients/admin-panel
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT_ADMIN_PANEL}:4000"
+    environment:
+      - ADMIN_KEYCLOAK_URL=${ADMIN_KEYCLOAK_URL}
+      - ADMIN_KEYCLOAK_REALM=${ADMIN_KEYCLOAK_REALM}
+      - ADMIN_KEYCLOAK_CLIENT_ID=${ADMIN_KEYCLOAK_CLIENT_ID}
+      - ADMIN_KEYCLOAK_CLIENT_SECRET=${ADMIN_KEYCLOAK_CLIENT_SECRET}
+      - ADMIN_REDIRECT_URI=${ADMIN_REDIRECT_URI}
+      - ADMIN_API_GATEWAY_URL=${ADMIN_API_GATEWAY_URL}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET}
+    depends_on:
+      - api-gateway
+      - keycloak
+    networks:
+      - gradebook-net
 
 volumes:
   mongo_data:
