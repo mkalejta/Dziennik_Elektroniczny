@@ -2,7 +2,6 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import proxyRouter from './routes/proxy.js';
-import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -16,7 +15,6 @@ app.use(cors({
 }));
 
 app.use('/api', proxyRouter);
-app.use('/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.send('API Gateway działa');

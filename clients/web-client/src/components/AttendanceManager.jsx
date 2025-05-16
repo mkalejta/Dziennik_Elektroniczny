@@ -7,22 +7,25 @@ export default function AttendanceManager() {
   const { user } = useUser();
   const { classes, attendance, addAttendance, editAttendance } = useTeacherData();
   const [selectedLesson, setSelectedLesson] = useState(null);
-  const [attendanceState, setAttendanceState] = useState({});
+  const [attendanceState, setAttendanceState] = useState([]);
   const [isNewAttendance, setIsNewAttendance] = useState(false);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
 
   const handleLessonSelect = (lesson) => {
     setSelectedLesson(lesson);
-    setAttendanceState(lesson.students || {});
+    setAttendanceState(lesson.students || []);
     setIsNewAttendance(false);
   };
 
   const handleAttendanceChange = (studentId) => {
-    setAttendanceState((prev) => ({
-      ...prev,
-      [studentId]: !prev[studentId],
-    }));
+    setAttendanceState((prev) =>
+      prev.map((student) =>
+        student.id === studentId
+          ? { ...student, present: !student.present }
+          : student
+      )
+    );
   };
 
   const handleClassSelect = (class_id) => {
@@ -42,14 +45,16 @@ export default function AttendanceManager() {
       await addAttendance(newAttendance);
     } else {
       const updatedAttendance = {
-        ...selectedLesson,
+        classId: selectedLesson.classId,
+        subjectId: selectedLesson.subjectId,
         students: attendanceState,
+        teacherId: user?.username
       };
       await editAttendance(selectedLesson.id, updatedAttendance);
     }
 
     setSelectedLesson(null);
-    setAttendanceState({});
+    setAttendanceState([]);
     setIsNewAttendance(false);
   };
 
@@ -70,12 +75,7 @@ export default function AttendanceManager() {
         students: students || [],
       });
 
-      setAttendanceState(
-        (students || []).reduce((acc, student) => {
-          acc[student.id] = false;
-          return acc;
-        }, {})
-      );
+      setAttendanceState(students || []);
 
       setIsNewAttendance(true);
     }
@@ -138,18 +138,15 @@ export default function AttendanceManager() {
         <Box>
           <Typography variant="h6" gutterBottom>
             {isNewAttendance
-              ? `Nowa obecność dla klasy ${selectedLesson.classId} (${selectedLesson.subjectId})`
-              : `Edycja obecności dla klasy ${selectedLesson.classId} (${selectedLesson.subjectId})`}
+              ? `Nowa obecność dla klasy ${selectedLesson.classId}`
+              : `Edycja obecności dla klasy ${selectedLesson.classId}`}
           </Typography>
           <List>
-            {Object.entries(selectedLesson.students || {}).map(([id, present]) => ({
-              id,
-              present,
-            })).map((student) => (
+            {selectedLesson.students.map((student) => (
               <ListItem key={student.id} sx={{ display: "flex", alignItems: "center" }}>
                 <ListItemText primary={`${student.name} ${student.surname}`} />
                 <Checkbox
-                  checked={attendanceState[student.id] ?? false}
+                  checked={attendanceState.find(s => s.id === student.id).present ?? false}
                   onChange={() => handleAttendanceChange(student.id)}
                 />
               </ListItem>

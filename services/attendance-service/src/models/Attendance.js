@@ -24,7 +24,7 @@ class Attendance {
             )
         ) {
             throw new Error(
-                'Invalid or missing "students" (must be an array of objects with fields { id, name, surname, prsent })'
+                'Invalid or missing "students" (must be an array of objects with fields { id, name, surname, present })'
             );
         }
         if (!attendance.subjectId || typeof attendance.subjectId !== 'string') {

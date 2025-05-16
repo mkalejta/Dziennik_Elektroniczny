@@ -196,8 +196,9 @@ async function convertTimetable(timetableResult, subjectsMap, db) {
             return {
                 id: lesson.id,
                 subject: subjectsMap.get(lesson.subject_id) || null,
-                teacher: teacher.name || null,
+                teacher: { name: teacher.name, surname: teacher.surname } || null,
                 day: lesson.day,
+                classId: lesson.class_id,
                 start_at: lesson.start_at,
                 finish_at: lesson.finish_at
             };

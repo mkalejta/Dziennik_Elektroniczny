@@ -1,23 +1,23 @@
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { checkAuth } from '../middleware/checkAuth.js';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const router = express.Router();
 
 const serviceMap = {
-    '/users': 'http://users-service:8001',
-    '/grades': 'http://grades-service:8002',
-    '/subjects': 'http://subjects-service:8003',
-    '/attendance': 'http://attendance-service:8004',
-    '/timetable': 'http://timetable-service:8005',
-    '/messages': 'http://messages-service:8006',
-    '/classes': 'http://classes-service:8007',
+    '/users': `http://users-service:${process.env.PORT_USERS_SERVICE}`,
+    '/grades': `http://grades-service:${process.env.PORT_GRADES_SERVICE}`,
+    '/subjects': `http://subjects-service:${process.env.PORT_SUBJECTS_SERVICE}`,
+    '/attendance': `http://attendance-service:${process.env.PORT_ATTENDANCE_SERVICE}`,
+    '/timetable': `http://timetable-service:${process.env.PORT_TIMETABLE_SERVICE}`,
+    '/messages': `http://messages-service:${process.env.PORT_MESSAGES_SERVICE}`,
+    '/classes': `http://classes-service:${process.env.PORT_CLASS_SERVICE}`,
 };
 
 Object.keys(serviceMap).forEach((path) => {
     router.use(
         `${path}`,
-        // checkAuth,
         createProxyMiddleware({
             target: serviceMap[path],
             changeOrigin: true,

@@ -102,9 +102,9 @@ export default function TimetableGrid() {
                   {lesson ? (
                     <Paper elevation={1} sx={{ p: 1, width: "90%", textAlign: "center" }}>
                       <Typography variant="body2" fontWeight="bold">
-                        {lesson.subject}
+                        {lesson.subject} {user?.role === "teacher" ? `${lesson.classId}` : null}
                       </Typography>
-                      <Typography variant="caption">{lesson.teacher}</Typography>
+                      <Typography variant="caption">{lesson.teacher?.name[0]}. {lesson.teacher?.surname}</Typography>
                     </Paper>
                   ) : null}
                 </Box>

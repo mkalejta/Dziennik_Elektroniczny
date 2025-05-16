@@ -241,6 +241,36 @@ INSERT INTO subjects (id, name, class_id, teacher_id) VALUES
 ('geo4C', 'Geografia', '4C', 'teacher20'),
 ('geo4D', 'Geografia', '4D', 'teacher20');
 
+-- Przykładowy plan lekcji (timetable)
+INSERT INTO timetable (class_id, subject_id, teacher_id, day, start_at, finish_at) VALUES
+-- 1A
+('1A', 'mat1A', 'teacher1', 'Poniedziałek', '08:00', '08:45'),
+('1A', 'fiz1A', 'teacher3', 'Wtorek', '09:00', '09:45'),
+('1A', 'chem1A', 'teacher5', 'Środa', '10:00', '10:45'),
+('1A', 'bio1A', 'teacher7', 'Czwartek', '11:00', '11:45'),
+('1A', 'hist1A', 'teacher9', 'Piątek', '12:00', '12:45'),
+
+-- 1B
+('1B', 'mat1B', 'teacher1', 'Poniedziałek', '09:00', '09:45'),
+('1B', 'fiz1B', 'teacher3', 'Wtorek', '10:00', '10:45'),
+('1B', 'chem1B', 'teacher5', 'Środa', '11:00', '11:45'),
+('1B', 'bio1B', 'teacher7', 'Czwartek', '12:00', '12:45'),
+('1B', 'hist1B', 'teacher9', 'Piątek', '13:00', '13:45'),
+
+-- 1C
+('1C', 'mat1C', 'teacher1', 'Poniedziałek', '10:00', '10:45'),
+('1C', 'fiz1C', 'teacher3', 'Wtorek', '11:00', '11:45'),
+('1C', 'chem1C', 'teacher5', 'Środa', '12:00', '12:45'),
+('1C', 'bio1C', 'teacher7', 'Czwartek', '13:00', '13:45'),
+('1C', 'hist1C', 'teacher9', 'Piątek', '08:00', '08:45'),
+
+-- 2A
+('2A', 'mat2A', 'teacher1', 'Poniedziałek', '11:00', '11:45'),
+('2A', 'fiz2A', 'teacher3', 'Wtorek', '12:00', '12:45'),
+('2A', 'chem2A', 'teacher5', 'Środa', '13:00', '13:45'),
+('2A', 'bio2A', 'teacher7', 'Czwartek', '08:00', '08:45'),
+('2A', 'hist2A', 'teacher9', 'Piątek', '09:00', '09:45');
+
 -- Dodanie relacji studentów do klas
 INSERT INTO students_classes (student_id, class_id) VALUES
 ('student1', '1A'),
