@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admina - Użytkownicy</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .user-row { transition: background 0.2s; }
+    .user-row:hover { background: #f8f9fa; }
+    .role-badge { text-transform: capitalize; }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h2 class="mb-4">Zarządzanie użytkownikami</h2>
+    <div class="d-flex mb-3 gap-2">
+      <input id="searchInput" type="text" class="form-control" placeholder="Szukaj użytkownika...">
+      <select id="roleFilter" class="form-select" style="max-width: 200px;">
+        <option value="">Wszystkie role</option>
+        <option value="student">Uczeń</option>
+        <option value="parent">Rodzic</option>
+        <option value="teacher">Nauczyciel</option>
+      </select>
+      <button class="btn btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        Dodaj użytkownika
+      </button>
+    </div>
+    <table class="table table-bordered align-middle">
+      <thead>
+        <tr>
+          <th>Imię</th>
+          <th>Nazwisko</th>
+          <th>Login</th>
+          <th>Rola</th>
+          <th style="width: 80px;">Akcje</th>
+        </tr>
+      </thead>
+      <tbody id="usersTable">
+        <% users.forEach(user => { %>
+          <tr class="user-row" data-name="<%= user.name %> <%= user.surname %>" data-role="<%= user.role %>">
+            <td><%= user.name %></td>
+            <td><%= user.surname %></td>
+            <td><%= user._id %></td>
+            <td><span class="badge bg-primary role-badge"><%= user.role %></span></td>
+            <td>
+              <button class="btn btn-danger btn-sm delete-btn" data-id="<%= user._id %>">Usuń</button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal dodawania użytkownika -->
+  <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="addUserForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addUserModalLabel">Dodaj użytkownika</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="addName" class="form-label">Imię</label>
+            <input type="text" class="form-control" id="addName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="addSurname" class="form-label">Nazwisko</label>
+            <input type="text" class="form-control" id="addSurname" name="surname" required>
+          </div>
+          <div class="mb-3">
+            <label for="addUsername" class="form-label">Login</label>
+            <input type="text" class="form-control" id="addUsername" name="username" required>
+          </div>
+          <div class="mb-3">
+            <label for="addEmail" class="form-label">Email</label>
+            <input type="text" class="form-control" id="addEmail" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="addRole" class="form-label">Rola</label>
+            <select class="form-select" id="addRole" name="role" required>
+              <option value="student">Uczeń</option>
+              <option value="parent">Rodzic</option>
+              <option value="teacher">Nauczyciel</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Dodaj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Filtrowanie po wyszukiwaniu i roli
+    const searchInput = document.getElementById('searchInput');
+    const roleFilter = document.getElementById('roleFilter');
+    const usersTable = document.getElementById('usersTable');
+
+    function filterUsers() {
+      const search = searchInput.value.toLowerCase();
+      const role = roleFilter.value;
+      Array.from(usersTable.children).forEach(row => {
+        const name = row.dataset.name.toLowerCase();
+        const userRole = row.dataset.role;
+        const matchesSearch = name.includes(search);
+        const matchesRole = !role || userRole === role;
+        row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterUsers);
+    roleFilter.addEventListener('change', filterUsers);
+
+    // Usuwanie użytkownika
+    usersTable.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        if (confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
+          const userId = e.target.dataset.id;
+          const res = await fetch(`/users/${userId}`, { method: 'DELETE' });
+          if (res.ok) {
+            e.target.closest('tr').remove();
+          } else {
+            alert('Błąd podczas usuwania użytkownika');
+          }
+        }
+      }
+    });
+
+    // Dodawanie użytkownika
+    document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        name: form.name.value,
+        surname: form.surname.value,
+        username: form.username.value,
+        email: form.email.value,
+        role: form.role.value
+      };
+      const res = await fetch('/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert('Błąd podczas dodawania użytkownika');
+      }
+    });
+  </script>
+</body>
+</html>
