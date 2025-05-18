@@ -30,7 +30,7 @@
         <tr>
           <th>Imię</th>
           <th>Nazwisko</th>
-          <th>Login</th>
+          <th>Username</th>
           <th>Rola</th>
           <th style="width: 80px;">Akcje</th>
         </tr>
@@ -140,7 +140,7 @@
         email: form.email.value,
         role: form.role.value
       };
-      const res = await fetch('/users', {
+      const res = await fetch('http://localhost:4000/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

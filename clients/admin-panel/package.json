@@ -3,8 +3,8 @@
     "description": "Admin panel for the application",
     "authors": "author",
     "version": "1.0.0",
-    "main": "pathToMain",
-    "type": "module",
+    "main": "src/app.js",
+    "type": "commonjs",
     "dependencies": {
         "axios": "^0.21.1",
         "express": "^4.17.1",

@@ -1,39 +1,13 @@
 const User = require('../models/User');
 const pgClient = require('../db/pgClient');
 const axios = require('axios');
-
-function generateTemporaryPassword() {
-    return Math.random().toString(36).slice(-8);
-}
-
-async function getKeycloakAdminToken() {
-    const keycloakUrl = process.env.KEYCLOAK_INTERNAL_URL;
-    const clientId = process.env.KEYCLOAK_CLIENT_ID;
-    const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET;
-    const realm = process.env.KEYCLOAK_REALM;
-
-    const response = await axios.post(
-        `${keycloakUrl}/realms/${realm}/protocol/openid-connect/token`,
-        new URLSearchParams({
-            grant_type: 'client_credentials',
-            client_id: clientId,
-            client_secret: clientSecret,
-        }),
-        {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        }
-    );
-
-    return response.data.access_token;
-}
+const { getKeycloakAdminToken, createKeycloakUser, deleteUserFromKeycloak } = require('../utils/keycloak');
 
 
 async function getAllUsers(req, res) {
     try {
         const db = req.app.locals.db;
-        const users = await db.collection('users').find().toArray();
+        const users = await db.collection('users').find({ role: { $ne: 'admin' } }).toArray();
         res.json(users.map(user => new User(user)));
     } catch (error) {
         console.error(error);
@@ -42,72 +16,49 @@ async function getAllUsers(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, surname, username, role } = req.body;
+    const { name, surname, email, username, role } = req.body;
 
+    if (!name || !surname || !username || !role) {
+        return res.status(400).send('Missing required fields');
+    }
+
+    const db = req.app.locals.db;
     try {
-
-        const temporaryPassword = await createKeycloakUser({ name, surname, email, username, role });
-
-        const db = req.app.locals.db;
+        // Sprawdzenie czy użytkownik już istnieje w Mongo
         const existingUser = await db.collection('users').findOne({ _id: username });
-
         if (existingUser) {
             return res.status(409).send('User already exists');
         }
 
-        if (!name || !surname || !username || !role) {
-            return res.status(400).send('Missing required fields');
+        // Tworzenie w Keycloak
+        let temporaryPassword;
+        try {
+            temporaryPassword = await createKeycloakUser({ name, surname, email, username, role });
+        } catch (err) {
+            console.error('Error creating user in Keycloak:', err);
+            return res.status(500).send('Failed to create user in Keycloak');
         }
 
-        await db.collection('users').insertOne({
-            _id: username,
-            name,
-            surname,
-            role,
-        });
+        // Tworzenie w MongoDB
+        try {
+            await db.collection('users').insertOne({
+                _id: username,
+                name,
+                surname,
+                role,
+            });
+        } catch (err) {
+            // Rollback w Keycloak
+            await deleteUserFromKeycloak(username).catch(() => {});
+            console.error('Error creating user in MongoDB:', err);
+            return res.status(500).send('Failed to create user in database');
+        }
 
         res.status(201).json({ message: 'User created successfully', temporaryPassword });
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).send('Internal server error');
     }
-}
-
-async function createKeycloakUser({ name, surname, email, username, role }) {
-    const keycloakUrl = process.env.KEYCLOAK_INTERNAL_URL;
-    const realm = process.env.KEYCLOAK_REALM;
-    const adminToken = await getKeycloakAdminToken();
-
-    const temporaryPassword = generateTemporaryPassword();
-
-    const userPayload = {
-        username,
-        email,
-        firstName: name,
-        lastName: surname,
-        enabled: true,
-        credentials: [
-            {
-                type: 'password',
-                value: temporaryPassword,
-                temporary: true,
-            },
-        ],
-        realmRoles: [role],
-    };
-
-    await axios.post(
-        `${keycloakUrl}/admin/realms/${realm}/users`,
-        userPayload,
-        {
-            headers: {
-                Authorization: `Bearer ${adminToken}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    );
-
-    return temporaryPassword;
 }
 
 async function getUser(req, res) {
@@ -133,15 +84,40 @@ async function deleteUser(req, res) {
         const db = req.app.locals.db;
         const userId = req.params.id;
 
-        const result = await db.collection('users').deleteOne({ _id: userId });
+        const keycloakUrl = process.env.KEYCLOAK_INTERNAL_URL;
+        const realm = process.env.KEYCLOAK_REALM;
+        const adminToken = await getKeycloakAdminToken();
 
+        // Usuń z Keycloak
+        const kcUsers = await axios.get(
+            `${keycloakUrl}/admin/realms/${realm}/users?username=${encodeURIComponent(userId)}`,
+            { headers: { Authorization: `Bearer ${adminToken}` } }
+        );
+
+        if (kcUsers.data.length === 0) {
+            return res.status(404).send('User not found in Keycloak');
+        }
+
+        const keycloakUserId = kcUsers.data[0].id;
+        try {
+            await axios.delete(
+                `${keycloakUrl}/admin/realms/${realm}/users/${keycloakUserId}`,
+                { headers: { Authorization: `Bearer ${adminToken}` } }
+            );
+        } catch (err) {
+            console.error('Error deleting user from Keycloak:', err);
+            return res.status(500).send('Failed to delete user from Keycloak');
+        }
+
+        // Usuń z MongoDB
+        const result = await db.collection('users').deleteOne({ _id: userId });
         if (result.deletedCount === 0) {
-            return res.status(404).send('User not found');
+            return res.status(404).send('User not found in database');
         }
 
         res.status(204).send();
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting user:', error);
         res.status(500).send('Server error');
     }
 }
@@ -171,10 +147,22 @@ async function getUserClass(req, res) {
     }
 }
 
+async function getAllTeachers(req, res) {
+    try {
+        const db = req.app.locals.db;
+        const result = await db.collection('users').find({ role: 'teacher' }).toArray();
+        res.json(result.map(user => new User(user)));
+    } catch (error) {
+        console.error('Error fetching teachers:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 module.exports = {
     getAllUsers,
     createUser,
     getUser,
     deleteUser,
     getUserClass,
+    getAllTeachers
 };

@@ -1,20 +1,20 @@
-import express from 'express';
-import axios from 'axios';
-import crypto from 'crypto';
-import { keycloak } from '../auth/keycloak.js';
-import dotenv from 'dotenv';
+const express = require('express');
+const axios = require('axios');
+const crypto = require('crypto');
+const dotenv = require('dotenv');
 const router = express.Router();
 dotenv.config();
 
 const {
-  ADMIN_KEYCLOAK_URL,
+  KEYCLOAK_INTERNAL_URL,
+  KEYCLOAK_PUBLIC_URL,
   ADMIN_KEYCLOAK_REALM,
   ADMIN_KEYCLOAK_CLIENT_ID,
   ADMIN_KEYCLOAK_CLIENT_SECRET
 } = process.env;
 
-const authEndpoint =  `${ADMIN_KEYCLOAK_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/auth`;
-const tokenEndpoint = `${ADMIN_KEYCLOAK_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/token`;
+const authEndpoint = `${KEYCLOAK_PUBLIC_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/auth`;
+const tokenEndpoint = `${KEYCLOAK_INTERNAL_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/token`;
 const redirectUrl = "http://localhost:4000/auth";
 
 function generateCodeVerifier() {
@@ -62,9 +62,10 @@ router.get('/auth', async (req, res) => {
       req.session.refresh_token = refresh_token;
       req.session.token_expires_at = Date.now() + expires_in * 1000;
 
+
       req.session.save();
 
-      res.redirect('/');
+      return res.redirect('/');
     })
     .catch(error => {
       console.error('Error fetching token:', error);
@@ -72,34 +73,8 @@ router.get('/auth', async (req, res) => {
     });
 });
 
-// router.get('/auth/login', async (req, res) => {
-//   try {
-//     const tokenResponse = await axios.post(tokenEndpoint, new URLSearchParams({
-//       grant_type: 'client_credentials',
-//       client_id: ADMIN_KEYCLOAK_CLIENT_ID,
-//       client_secret: ADMIN_KEYCLOAK_CLIENT_SECRET
-//     }), {
-//       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-//     });
-
-//     const { access_token, refresh_token, expires_in } = tokenResponse.data;
-
-//     // Zapisz tokeny do sesji (która jest w Redisie)
-//     req.session.access_token = access_token;
-//     req.session.refresh_token = refresh_token;
-//     req.session.token_expires_at = Date.now() + expires_in * 1000;
-//     await req.session.save();
-
-//     res.redirect('/');
-//   } catch (error) {
-//     console.error('Error fetching token:', error);
-//     return res.status(500).send('Error fetching token');
-//   }
-// });
-
 router.get('/logout', (req, res) => {
-  keycloak.logout();
   res.redirect('/');
 });
 
-export default router;
+module.exports = router;

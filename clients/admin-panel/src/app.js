@@ -1,20 +1,18 @@
-import express from 'express';
-import session from 'express-session';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import { memoryStore } from './auth/keycloak.js';
-import indexRoutes from './routes/indexRoute.js';
-import userRoutes from './routes/userRoutes.js';
-import timetableRoutes from './routes/timetableRoutes.js';
-import { ensureValidToken } from './middleware/tokenMiddleware.js';
-import bodyParser from 'body-parser';
+const express = require('express');
+const session = require('express-session');
+const path = require('path');
+const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+const indexRoutes = require('./routes/indexRoute.js');
+const userRoutes = require('./routes/userRoutes.js');
+const timetableRoutes = require('./routes/timetableRoutes.js');
+const { ensureValidToken } = require('./middleware/tokenMiddleware.js');
+
 dotenv.config();
 
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const memoryStore = new session.MemoryStore();
 
 app.use(session({
   store: memoryStore,

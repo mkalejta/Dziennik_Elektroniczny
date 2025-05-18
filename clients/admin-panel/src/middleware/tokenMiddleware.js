@@ -1,8 +1,8 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
+const axios = require('axios');
+const dotenv = require('dotenv');
 dotenv.config();
 
-export async function ensureValidToken(req, res, next) {
+const ensureValidToken = async (req, res, next) => {
   if (!req.session.access_token || !req.session.token_expires_at) {
     return res.redirect('/login');
   }
@@ -10,13 +10,13 @@ export async function ensureValidToken(req, res, next) {
   if (Date.now() > req.session.token_expires_at - 60 * 1000) {
     try {
       const {
-        ADMIN_KEYCLOAK_URL,
+        KEYCLOAK_INTERNAL_URL,
         ADMIN_KEYCLOAK_REALM,
         ADMIN_KEYCLOAK_CLIENT_ID,
         ADMIN_KEYCLOAK_CLIENT_SECRET
       } = process.env;
 
-      const tokenEndpoint = `${ADMIN_KEYCLOAK_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/token`;
+      const tokenEndpoint = `${KEYCLOAK_INTERNAL_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/token`;
 
       const tokenResponse = await axios.post(tokenEndpoint, new URLSearchParams({
         grant_type: 'refresh_token',
@@ -38,3 +38,5 @@ export async function ensureValidToken(req, res, next) {
   }
   next();
 }
+
+module.exports = { ensureValidToken };

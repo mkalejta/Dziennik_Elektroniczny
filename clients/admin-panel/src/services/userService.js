@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 const API_GATEWAY_URL = process.env.ADMIN_API_GATEWAY_URL;
 
@@ -31,7 +31,7 @@ async function getUserById(req, res) {
     console.error('Error fetching user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
-};
+}
 
 async function createUser(req, res) {
   const userData = req.body;
@@ -42,12 +42,13 @@ async function createUser(req, res) {
         'Authorization': `Bearer ${accessToken}`
       }
     });
+    console.log('User created:', newUser.data);
     res.status(201).json(newUser.data);
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
-};
+}
 
 async function deleteUser(req, res) {
   const userId = req.params.id;
@@ -63,9 +64,9 @@ async function deleteUser(req, res) {
     console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
-};
+}
 
-export {
+module.exports = {
   getUsers,
   getUserById,
   createUser,

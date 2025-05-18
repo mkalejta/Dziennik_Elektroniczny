@@ -4,9 +4,10 @@ const userController = require('../controllers/userController');
 const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', userController.getAllUsers);
-router.post('/create', userController.createUser);
+router.post('/', userController.createUser);
 router.get('/:id', userController.getUser);
 router.delete('/:id', userController.deleteUser);
 router.get('/:id/class', userController.getUserClass);
+router.get('/teachers', userController.getAllTeachers);
 
 module.exports = router;
