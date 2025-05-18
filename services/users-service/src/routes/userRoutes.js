@@ -8,6 +8,5 @@ router.post('/', userController.createUser);
 router.get('/:id', userController.getUser);
 router.delete('/:id', userController.deleteUser);
 router.get('/:id/class', userController.getUserClass);
-router.get('/teachers', userController.getAllTeachers);
 
 module.exports = router;

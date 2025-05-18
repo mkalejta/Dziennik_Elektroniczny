@@ -147,22 +147,10 @@ async function getUserClass(req, res) {
     }
 }
 
-async function getAllTeachers(req, res) {
-    try {
-        const db = req.app.locals.db;
-        const result = await db.collection('users').find({ role: 'teacher' }).toArray();
-        res.json(result.map(user => new User(user)));
-    } catch (error) {
-        console.error('Error fetching teachers:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-
 module.exports = {
     getAllUsers,
     createUser,
     getUser,
     deleteUser,
-    getUserClass,
-    getAllTeachers
+    getUserClass
 };

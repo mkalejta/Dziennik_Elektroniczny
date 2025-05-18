@@ -11,6 +11,11 @@
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-light bg-light mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">&lArr; Strona główna</a>
+    </div>
+  </nav>
   <div class="container py-4">
     <h2 class="mb-4">Zarządzanie użytkownikami</h2>
     <div class="d-flex mb-3 gap-2">
@@ -109,16 +114,29 @@
         const matchesRole = !role || userRole === role;
         row.style.display = (matchesSearch && matchesRole) ? '' : 'none';
       });
+      // Zapisz filtr roli do localStorage
+      localStorage.setItem('users_role_filter', roleFilter.value);
     }
 
     searchInput.addEventListener('input', filterUsers);
     roleFilter.addEventListener('change', filterUsers);
+
+    // Odczytaj filtr roli po przeładowaniu
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedRole = localStorage.getItem('users_role_filter');
+      if (savedRole) {
+        roleFilter.value = savedRole;
+      }
+      filterUsers();
+    });
 
     // Usuwanie użytkownika
     usersTable.addEventListener('click', async (e) => {
       if (e.target.classList.contains('delete-btn')) {
         if (confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
           const userId = e.target.dataset.id;
+          // Zapisz filtr roli przed reloadem
+          localStorage.setItem('users_role_filter', roleFilter.value);
           const res = await fetch(`/users/${userId}`, { method: 'DELETE' });
           if (res.ok) {
             e.target.closest('tr').remove();
@@ -140,6 +158,8 @@
         email: form.email.value,
         role: form.role.value
       };
+      // Zapisz filtr roli przed reloadem
+      localStorage.setItem('users_role_filter', roleFilter.value);
       const res = await fetch('http://localhost:4000/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

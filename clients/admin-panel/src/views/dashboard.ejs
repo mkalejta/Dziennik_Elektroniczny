@@ -1,14 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <meta charset="UTF-8">
+  <title><%= title || "Panel Admina" %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+    .dashboard-card {
+      transition: box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .dashboard-card:hover {
+      box-shadow: 0 0 0.5rem #0d6efd33;
+      background: #e9ecef;
+    }
+    .nav-link.active {
+      font-weight: bold;
+      color: #0d6efd !important;
+    }
+  </style>
 </head>
 <body>
-  <div style="text-align:right; margin: 1em;">
-    <a href="/login" class="btn btn-primary">Zaloguj się jako administrator</a>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">Panel Admina</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/users">Użytkownicy</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/timetable">Plan lekcji</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <% if (isAuthenticated) { %>
+            <a href="/logout" class="btn btn-outline-danger">Wyloguj</a>
+          <% } else { %>
+            <a href="/login" class="btn btn-primary">Zaloguj się jako administrator</a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">Panel administracyjny</h1>
+    <div class="row justify-content-center g-4">
+      <div class="col-md-4">
+        <a href="/users" class="text-decoration-none">
+          <div class="card dashboard-card text-center p-4">
+            <div class="card-body">
+              <h3 class="card-title mb-2">Użytkownicy</h3>
+              <p class="card-text text-secondary">Zarządzaj kontami użytkowników, dodawaj i usuwaj konta, filtruj po roli.</p>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a href="/timetable" class="text-decoration-none">
+          <div class="card dashboard-card text-center p-4">
+            <div class="card-body">
+              <h3 class="card-title mb-2">Plan lekcji</h3>
+              <p class="card-text text-secondary">Przeglądaj i edytuj plan lekcji dla klas i nauczycieli.</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
   </div>
-  <h1>Welcome to the Admin Dashboard</h1>
-  <p>Manage users, timetables and more.</p>
 </body>
 </html>

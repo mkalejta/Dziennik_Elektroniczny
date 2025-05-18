@@ -470,6 +470,28 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
+    "id" : "1bfac351-0005-4dd9-b719-b07abe9c6b52",
+    "username" : "jlentil",
+    "firstName" : "Jan",
+    "lastName" : "Lentil",
+    "email" : "jlentil@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747599935258,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "5c8ed685-d5a7-4a8d-878e-c3cc847ca6ee",
+      "type" : "password",
+      "createdDate" : 1747599935978,
+      "secretData" : "{\"value\":\"NHv7e5bvAy85B+yqoXd31mkrjvumIyl8SuvZWyOTAasNRkcALg/o+nY40UQUeF6+Hu0u+nJDJLFvrO2UegdjtQ==\",\"salt\":\"OaySu2Q6CQfFBDLuSfDp2Q==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ "UPDATE_PASSWORD" ],
+    "realmRoles" : [ "default-roles-gradebook" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "7dfbdc27-9401-4143-8ddd-891c9866eb75",
     "username" : "parent1",
     "firstName" : "Jan",

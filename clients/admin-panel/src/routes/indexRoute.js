@@ -38,7 +38,10 @@ code_challenge_method=S256&
 scope=offline_access`;
 
 router.get('/', (req, res) => {
-  res.render('dashboard', { title: 'Dashboard' });
+  res.render('dashboard', {
+    title: 'Dashboard',
+    isAuthenticated: !!req.session.access_token
+  });
 });
 
 router.get('/login', (req, res) => {
@@ -73,8 +76,11 @@ router.get('/auth', async (req, res) => {
     });
 });
 
-router.get('/logout', (req, res) => {
-  res.redirect('/');
+router.get('/logout', async (req, res) => {
+  req.session.destroy(async () => {
+    await axios.post(`${KEYCLOAK_INTERNAL_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/logout`);
+    res.redirect("/");
+  });
 });
 
 module.exports = router;

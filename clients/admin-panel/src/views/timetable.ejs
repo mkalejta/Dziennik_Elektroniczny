@@ -19,24 +19,29 @@
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-light bg-light mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">&lArr; Strona główna</a>
+    </div>
+  </nav>
   <div class="container py-4">
     <h2 class="mb-4">Zarządzanie planem lekcji</h2>
-    <div class="row mb-3">
+    <div class="row mb-3 align-items-end">
       <div class="col-md-4">
         <label for="classSelect" class="form-label">Wybierz klasę</label>
         <select id="classSelect" class="form-select">
           <option value="">-- wybierz --</option>
           <% classes.forEach(cls => { %>
-            <option value="<%= cls.id %>"><%= cls.name %></option>
+            <option value="<%= cls %>"><%= cls %></option>
           <% }) %>
         </select>
       </div>
-      <div class="col-md-4">
-        <label for="teacherSelect" class="form-label">Wybierz nauczyciela</label>
-        <select id="teacherSelect" class="form-select">
+      <div class="col-md-4 offset-md-4 text-end">
+        <label class="form-label mb-0" style="font-weight: bold;">Podgląd planu nauczyciela:</label>
+        <select id="teacherSelect" class="form-select d-inline-block w-auto ms-2" style="min-width: 200px;">
           <option value="">-- wybierz --</option>
           <% teachers.forEach(t => { %>
-            <option value="<%= t.id %>"><%= t.name %> <%= t.surname %></option>
+            <option value="<%= t._id %>"><%= t.name %> <%= t.surname %></option>
           <% }) %>
         </select>
       </div>
@@ -54,42 +59,13 @@
           </tr>
         </thead>
         <tbody>
-          <% const hours = [
-            "08:00 - 08:45",
-            "09:00 - 09:45",
-            "10:00 - 10:45",
-            "11:00 - 11:45",
-            "12:00 - 12:45",
-            "13:00 - 13:45"
-          ]; %>
-          <% hours.forEach((hour, hIdx) => { %>
-            <tr>
-              <th><%= hour %></th>
-              <% days.forEach((day, dIdx) => { %>
-                <td data-day="<%= day %>" data-hour="<%= hour %>">
-                  <% 
-                    const lesson = (timetable || []).find(l => l.day === day && l.hour === hour);
-                  %>
-                  <% if (lesson) { %>
-                    <div class="lesson-box" 
-                         data-lesson='<%- JSON.stringify(lesson) %>' 
-                         onclick="openLessonModal('<%- JSON.stringify(lesson) %>')">
-                      <strong><%= lesson.subject %></strong><br>
-                      <small><%= lesson.teacherName %> <%= lesson.teacherSurname %></small>
-                    </div>
-                  <% } else { %>
-                    <button class="btn btn-outline-success btn-sm add-btn" onclick="openAddModal('<%= day %>', '<%= hour %>')">+</button>
-                  <% } %>
-                </td>
-              <% }) %>
-            </tr>
-          <% }) %>
+          <!-- Wiersze będą renderowane przez JS -->
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Modal dodawania/edycji lekcji -->
+  <!-- Modal dodawania/edcyji lekcji -->
   <div class="modal fade" id="lessonModal" tabindex="-1" aria-labelledby="lessonModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <form id="lessonForm" class="modal-content">
@@ -101,28 +77,29 @@
           <input type="hidden" id="lessonId" name="id">
           <div class="mb-3">
             <label for="lessonDay" class="form-label">Dzień</label>
-            <input type="text" class="form-control" id="lessonDay" name="day" readonly>
-          </div>
-          <div class="mb-3">
-            <label for="lessonHour" class="form-label">Godzina</label>
-            <input type="text" class="form-control" id="lessonHour" name="hour" readonly>
-          </div>
-          <div class="mb-3">
-            <label for="lessonSubject" class="form-label">Przedmiot</label>
-            <select class="form-select" id="lessonSubject" name="subject_id" required>
+            <select class="form-select" id="lessonDay" name="day" required>
               <option value="">-- wybierz --</option>
-              <% subjects.forEach(s => { %>
-                <option value="<%= s.id %>"><%= s.name %></option>
-              <% }) %>
+              <% const daysList = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"]; %>
+              <% daysList.forEach(function(day) { %>
+                <option value="<%= day %>"><%= day %></option>
+              <% }); %>
             </select>
           </div>
           <div class="mb-3">
-            <label for="lessonTeacher" class="form-label">Nauczyciel</label>
-            <select class="form-select" id="lessonTeacher" name="teacher_id" required>
+            <label for="lessonHour" class="form-label">Godzina</label>
+            <select class="form-select" id="lessonHour" name="hour" required>
               <option value="">-- wybierz --</option>
-              <% teachers.forEach(t => { %>
-                <option value="<%= t.id %>"><%= t.name %> <%= t.surname %></option>
-              <% }) %>
+              <% const hoursList = [
+                "08:00 - 08:45",
+                "09:00 - 09:45",
+                "10:00 - 10:45",
+                "11:00 - 11:45",
+                "12:00 - 12:45",
+                "13:00 - 13:45"
+              ]; %>
+              <% hoursList.forEach(function(hour) { %>
+                <option value="<%= hour %>"><%= hour %></option>
+              <% }); %>
             </select>
           </div>
           <div class="mb-3">
@@ -130,8 +107,20 @@
             <select class="form-select" id="lessonClass" name="class_id" required>
               <option value="">-- wybierz --</option>
               <% classes.forEach(cls => { %>
-                <option value="<%= cls.id %>"><%= cls.name %></option>
+                <option value="<%= cls %>"><%= cls %></option>
               <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="lessonTeacher" class="form-label">Nauczyciel</label>
+            <select class="form-select" id="lessonTeacher" name="teacher_id" required disabled>
+              <option value="">-- wybierz --</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="lessonSubject" class="form-label">Przedmiot</label>
+            <select class="form-select" id="lessonSubject" name="subject_id" required disabled>
+              <option value="">-- wybierz --</option>
             </select>
           </div>
         </div>
@@ -146,38 +135,114 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Dane do dynamicznego ładowania planu
-    const timetable = "<%- JSON.stringify(timetable || []) %>";
-    const subjects = "<%- JSON.stringify(subjects || []) %>";
-    const teachers = "<%- JSON.stringify(teachers || []) %>";
-    const classes = "<%- JSON.stringify(classes || []) %>";
+    const timetable = JSON.parse('<%- JSON.stringify(timetable || []) %>');
+    const subjects = JSON.parse('<%- JSON.stringify(subjects || []) %>');
+    const teachers = JSON.parse('<%- JSON.stringify(teachers || []) %>');
+    const classes = JSON.parse('<%- JSON.stringify(classes || []) %>');
 
     // Obsługa modali
     const lessonModal = new bootstrap.Modal(document.getElementById('lessonModal'));
     const lessonForm = document.getElementById('lessonForm');
     const deleteLessonBtn = document.getElementById('deleteLessonBtn');
 
+    // Helpery do selectów w modalu
+    function fillTeacherSelect(classId) {
+      const teacherSelect = document.getElementById('lessonTeacher');
+      teacherSelect.innerHTML = '<option value="">-- wybierz --</option>';
+      if (!classId) {
+        teacherSelect.disabled = true;
+        return;
+      }
+      // Nauczyciele uczący w tej klasie (na podstawie subjects)
+      const teacherIds = [...new Set(subjects.filter(s => s.class_id === classId).map(s => s.teacher_id))];
+      teachers.filter(t => teacherIds.includes(t._id)).forEach(t => {
+        teacherSelect.innerHTML += `<option value="${t._id}">${t.name} ${t.surname}</option>`;
+      });
+      teacherSelect.disabled = false;
+    }
+
+    function fillSubjectSelect(classId, teacherId) {
+      const subjectSelect = document.getElementById('lessonSubject');
+      subjectSelect.innerHTML = '<option value="">-- wybierz --</option>';
+      if (!classId || !teacherId) {
+        subjectSelect.disabled = true;
+        return;
+      }
+      // Przedmioty prowadzone przez nauczyciela w tej klasie
+      subjects.filter(s => s.class_id === classId && s.teacher_id === teacherId).forEach(s => {
+        subjectSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+      });
+      subjectSelect.disabled = false;
+    }
+
+    // MODAL: Dodawanie lekcji
     function openAddModal(day, hour) {
+      // Jeśli nie wybrano klasy, nie pozwól otworzyć modala
+      if (!document.getElementById('classSelect').value) return;
       lessonForm.reset();
       document.getElementById('lessonModalLabel').innerText = 'Dodaj lekcję';
       document.getElementById('lessonDay').value = day;
+      document.getElementById('lessonDay').disabled = true;
       document.getElementById('lessonHour').value = hour;
+      document.getElementById('lessonHour').disabled = true;
       document.getElementById('lessonId').value = '';
       deleteLessonBtn.style.display = 'none';
+
+      // Jeśli filtr klasy jest wybrany, ustaw klasę i zablokuj select
+      const classFilter = document.getElementById('classSelect').value;
+      const teacherFilter = document.getElementById('teacherSelect').value;
+      document.getElementById('lessonClass').value = classFilter || '';
+      document.getElementById('lessonClass').disabled = !!classFilter;
+      fillTeacherSelect(classFilter);
+      document.getElementById('lessonTeacher').value = teacherFilter || '';
+      document.getElementById('lessonTeacher').disabled = !classFilter;
+      fillSubjectSelect(classFilter, teacherFilter);
+      document.getElementById('lessonSubject').disabled = !(classFilter && teacherFilter);
+
+      // Automatycznie ustaw nauczyciela jeśli filtr jest wybrany
+      if (teacherFilter) {
+        document.getElementById('lessonTeacher').value = teacherFilter;
+        document.getElementById('lessonTeacher').disabled = true;
+        fillSubjectSelect(classFilter, teacherFilter);
+      }
+
       lessonModal.show();
     }
 
-    function openLessonModal(lesson) {
+    // MODAL: Edycja lekcji - blokuj wszystkie selecty poza godziną
+    function openLessonModal(lessonObj) {
+      // Jeśli nie wybrano klasy, nie pozwól edytować
+      if (!document.getElementById('classSelect').value) return;
+      let lesson = lessonObj;
+      if (typeof lesson === 'string') lesson = JSON.parse(lesson);
       lessonForm.reset();
       document.getElementById('lessonModalLabel').innerText = 'Edytuj lekcję';
       document.getElementById('lessonDay').value = lesson.day;
-      document.getElementById('lessonHour').value = lesson.hour;
+      document.getElementById('lessonHour').value = lesson.start_at + ' - ' + lesson.finish_at;
       document.getElementById('lessonId').value = lesson.id;
-      document.getElementById('lessonSubject').value = lesson.subject_id;
-      document.getElementById('lessonTeacher').value = lesson.teacher_id;
       document.getElementById('lessonClass').value = lesson.class_id;
+      document.getElementById('lessonClass').disabled = true;
+      fillTeacherSelect(lesson.class_id);
+      document.getElementById('lessonTeacher').value = lesson.teacher_id;
+      document.getElementById('lessonTeacher').disabled = true;
+      fillSubjectSelect(lesson.class_id, lesson.teacher_id);
+      document.getElementById('lessonSubject').value = lesson.subject_id;
+      document.getElementById('lessonSubject').disabled = true;
       deleteLessonBtn.style.display = 'inline-block';
       lessonModal.show();
     }
+
+    // Obsługa zależności selectów w modalu (dodawanie)
+    document.getElementById('lessonClass').addEventListener('change', function() {
+      fillTeacherSelect(this.value);
+      document.getElementById('lessonTeacher').value = '';
+      document.getElementById('lessonSubject').innerHTML = '<option value="">-- wybierz --</option>';
+      document.getElementById('lessonSubject').disabled = true;
+    });
+    document.getElementById('lessonTeacher').addEventListener('change', function() {
+      fillSubjectSelect(document.getElementById('lessonClass').value, this.value);
+      document.getElementById('lessonSubject').value = '';
+    });
 
     // Obsługa submit formularza
     lessonForm.onsubmit = async function(e) {
@@ -185,7 +250,8 @@
       const data = {
         id: document.getElementById('lessonId').value,
         day: document.getElementById('lessonDay').value,
-        hour: document.getElementById('lessonHour').value,
+        start_at: document.getElementById('lessonHour').value.split(' - ')[0],
+        finish_at: document.getElementById('lessonHour').value.split(' - ')[1],
         subject_id: document.getElementById('lessonSubject').value,
         teacher_id: document.getElementById('lessonTeacher').value,
         class_id: document.getElementById('lessonClass').value
@@ -206,6 +272,9 @@
             body: JSON.stringify(data)
           });
         }
+        // ZAPISZ FILTRY PRZED RELOADEM
+        localStorage.setItem('timetable_class', document.getElementById('classSelect').value);
+        localStorage.setItem('timetable_teacher', document.getElementById('teacherSelect').value);
         location.reload();
       } catch (err) {
         alert('Błąd podczas zapisu lekcji');
@@ -217,6 +286,9 @@
       const id = document.getElementById('lessonId').value;
       if (id && confirm('Czy na pewno chcesz usunąć tę lekcję?')) {
         try {
+          // ZAPISZ FILTRY PRZED RELOADEM
+          localStorage.setItem('timetable_class', document.getElementById('classSelect').value);
+          localStorage.setItem('timetable_teacher', document.getElementById('teacherSelect').value);
           await fetch(`/timetable/${id}`, { method: 'DELETE' });
           location.reload();
         } catch (err) {
@@ -225,15 +297,97 @@
       }
     };
 
-    // Przełączanie widoku po zmianie klasy/nauczyciela
+    // Funkcja do renderowania planu na podstawie filtrów
+    function renderTimetable() {
+      const classId = document.getElementById('classSelect').value;
+      const teacherId = document.getElementById('teacherSelect').value;
+      const tableBody = document.querySelector('.timetable-table tbody');
+      const days = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"];
+      const hours = [
+        "08:00 - 08:45",
+        "09:00 - 09:45",
+        "10:00 - 10:45",
+        "11:00 - 11:45",
+        "12:00 - 12:45",
+        "13:00 - 13:45"
+      ];
+
+      // Jeśli nie wybrano żadnego filtra, nie renderuj planu
+      if (!classId && !teacherId) {
+        tableBody.innerHTML = '';
+        return;
+      }
+
+      // Filtrowanie lekcji
+      let filtered = timetable;
+      if (classId) filtered = filtered.filter(l => l.class_id === classId);
+      if (teacherId) filtered = filtered.filter(l => l.teacher_id === teacherId);
+
+      // Renderowanie wierszy
+      let html = '';
+      hours.forEach(hour => {
+        html += `<tr><th>${hour}</th>`;
+        days.forEach(day => {
+          const lesson = filtered.find(l => l.day === day && `${l.start_at} - ${l.finish_at}` === hour);
+          if (lesson) {
+            // Pobierz nazwę przedmiotu i nauczyciela
+            const subject = subjects.find(s => s.id === lesson.subject_id);
+            const teacher = teachers.find(t => (t._id || t.id) === lesson.teacher_id);
+            // Edycja tylko przy wybranej klasie
+            if (classId) {
+              html += `<td>
+                <div class="lesson-box" 
+                  data-lesson='${JSON.stringify(lesson)}'
+                  onclick='openLessonModal(${JSON.stringify(lesson)})'>
+                  <strong>${subject ? subject.name : ''}</strong><br>
+                  <small>${teacher ? teacher.name + ' ' + teacher.surname : ''}</small>
+                </div>
+              </td>`;
+            } else {
+              html += `<td>
+                <div class="lesson-box">
+                  <strong>${subject ? subject.name : ''}</strong><br>
+                  <small>${teacher ? teacher.name + ' ' + teacher.surname : ''}</small>
+                </div>
+              </td>`;
+            }
+          } else {
+            // Dodawanie tylko przy wybranej klasie
+            if (classId) {
+              html += `<td><button class="btn btn-outline-success btn-sm add-btn" onclick="openAddModal('${day}', '${hour}')">+</button></td>`;
+            } else {
+              html += `<td></td>`;
+            }
+          }
+        });
+        html += '</tr>';
+      });
+      tableBody.innerHTML = html;
+    }
+
+    // Zerowanie selectów nawzajem
     document.getElementById('classSelect').onchange = function() {
-      const classId = this.value;
-      window.location.href = classId ? `/timetable/class/${classId}` : '/timetable';
+      if (this.value) {
+        document.getElementById('teacherSelect').value = '';
+      }
+      renderTimetable();
     };
     document.getElementById('teacherSelect').onchange = function() {
-      const teacherId = this.value;
-      window.location.href = teacherId ? `/timetable/teacher/${teacherId}` : '/timetable';
+      if (this.value) document.getElementById('classSelect').value = '';
+      renderTimetable();
     };
+
+    // ODCZYT FILTRÓW PO RELOADZIE
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedClass = localStorage.getItem('timetable_class');
+      const savedTeacher = localStorage.getItem('timetable_teacher');
+      if (savedClass) document.getElementById('classSelect').value = savedClass;
+      if (savedTeacher) document.getElementById('teacherSelect').value = savedTeacher;
+      renderTimetable();
+      // Wyczyść po użyciu
+      localStorage.removeItem('timetable_class');
+      localStorage.removeItem('timetable_teacher');
+    });
   </script>
 </body>
 </html>
