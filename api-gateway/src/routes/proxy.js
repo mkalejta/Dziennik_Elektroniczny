@@ -13,6 +13,7 @@ const serviceMap = {
     '/timetable': `http://timetable-service:${process.env.PORT_TIMETABLE_SERVICE}`,
     '/messages': `http://messages-service:${process.env.PORT_MESSAGES_SERVICE}`,
     '/classes': `http://classes-service:${process.env.PORT_CLASS_SERVICE}`,
+    '/reports': `http://reports-client:${process.env.PORT_REPORTS_CLIENT}`,
 };
 
 Object.keys(serviceMap).forEach((path) => {

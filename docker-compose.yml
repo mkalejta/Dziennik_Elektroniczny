@@ -102,6 +102,7 @@ services:
       - PORT_TIMETABLE_SERVICE=${PORT_TIMETABLE_SERVICE}
       - PORT_MESSAGES_SERVICE=${PORT_MESSAGES_SERVICE}
       - PORT_CLASS_SERVICE=${PORT_CLASS_SERVICE}
+      - PORT_REPORTS_CLIENT=${PORT_REPORTS_CLIENT}
     depends_on:
       - keycloak
     networks:
@@ -361,6 +362,7 @@ services:
       - CLIENT_ID=${REPORTS_KEYCLOAK_CLIENT_ID}
       - CLIENT_SECRET=${REPORTS_KEYCLOAK_CLIENT_SECRET}
       - SHEET_ID=${SHEET_ID}
+      - PORT=${PORT_REPORTS_CLIENT}
     depends_on:
       - api-gateway
       - keycloak

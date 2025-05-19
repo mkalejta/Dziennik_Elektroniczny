@@ -287,7 +287,6 @@
         "containerId" : "736fb14c-dab4-4bd6-9b44-fc61c9fdd87f",
         "attributes" : { }
       } ],
-      "school-reports-client" : [ ],
       "web-client" : [ {
         "id" : "180ec243-b145-4de6-bb79-982638da071f",
         "name" : "uma_protection",
@@ -298,6 +297,7 @@
       } ],
       "security-admin-console" : [ ],
       "admin-cli" : [ ],
+      "reports-client" : [ ],
       "account-console" : [ ],
       "broker" : [ {
         "id" : "cbb2d681-de10-47e0-9f59-357072cbf6ef",
@@ -531,6 +531,20 @@
       "admin-client" : [ "uma_protection" ],
       "realm-management" : [ "manage-users", "realm-admin" ]
     },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "3d841d7f-18bb-4f27-99bd-31b8c009aaa1",
+    "username" : "service-account-reports-client",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747670403945,
+    "enabled" : true,
+    "totp" : false,
+    "serviceAccountClientId" : "reports-client",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-gradebook" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -883,7 +897,7 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "fc83a867-f742-4954-9cad-4916cd899a52",
-    "clientId" : "school-reports-client",
+    "clientId" : "reports-client",
     "name" : "",
     "description" : "",
     "rootUrl" : "",
@@ -902,21 +916,71 @@
     "standardFlowEnabled" : false,
     "implicitFlowEnabled" : false,
     "directAccessGrantsEnabled" : true,
-    "serviceAccountsEnabled" : false,
+    "serviceAccountsEnabled" : true,
     "publicClient" : false,
     "frontchannelLogout" : true,
     "protocol" : "openid-connect",
     "attributes" : {
-      "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1747643841",
-      "backchannel.logout.session.required" : "true",
       "oauth2.device.authorization.grant.enabled" : "false",
+      "backchannel.logout.revoke.offline.tokens" : "false",
+      "use.refresh.tokens" : "true",
+      "oidc.ciba.grant.enabled" : "false",
+      "client.use.lightweight.access.token.enabled" : "false",
+      "backchannel.logout.session.required" : "true",
+      "client_credentials.use_refresh_token" : "false",
+      "tls.client.certificate.bound.access.tokens" : "false",
+      "require.pushed.authorization.requests" : "false",
+      "acr.loa.map" : "{}",
       "display.on.consent.screen" : "false",
-      "backchannel.logout.revoke.offline.tokens" : "false"
+      "token.response.type.bearer.lower-case" : "false"
     },
     "authenticationFlowBindingOverrides" : { },
     "fullScopeAllowed" : true,
     "nodeReRegistrationTimeout" : -1,
+    "protocolMappers" : [ {
+      "id" : "2a2645c1-84d3-4780-adda-ca3369b28970",
+      "name" : "Client IP Address",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "clientAddress",
+        "introspection.token.claim" : "true",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "clientAddress",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "id" : "0baf8804-466a-416a-8fac-e02d09b36679",
+      "name" : "Client ID",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "client_id",
+        "introspection.token.claim" : "true",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "client_id",
+        "jsonType.label" : "String"
+      }
+    }, {
+      "id" : "0df13e84-7e18-4834-8693-ccd65fd5c188",
+      "name" : "Client Host",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-usersessionmodel-note-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "user.session.note" : "clientHost",
+        "introspection.token.claim" : "true",
+        "id.token.claim" : "true",
+        "access.token.claim" : "true",
+        "claim.name" : "clientHost",
+        "jsonType.label" : "String"
+      }
+    } ],
     "defaultClientScopes" : [ "web-origins", "acr", "roles", "profile", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {

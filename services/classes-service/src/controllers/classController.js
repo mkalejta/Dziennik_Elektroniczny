@@ -72,7 +72,6 @@ async function getStudentsInClass(req, res) {
 
     const students = await usersCollection
       .find({ _id: { $in: studentIds }, role: 'student' })
-      .project({ password: 0 }) // Nie zwracam haseł
       .toArray();
 
     res.json(students);

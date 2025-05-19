@@ -69,6 +69,15 @@
         </a>
       </div>
     </div>
+    <% if (isAuthenticated) { %>
+      <button id="generateReportBtn" class="btn btn-warning center">Generuj raport ocen</button>
+      <script>
+        document.getElementById('generateReportBtn').onclick = async function() {
+          const res = await fetch('http://localhost:8081/api/reports', { method: 'POST' });
+          alert(await res.text());
+        }
+      </script>
+    <% } %>
   </div>
 </body>
 </html>
