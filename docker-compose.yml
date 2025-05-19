@@ -85,6 +85,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "${PORT_RABBITMQ}:5672"
+      - "${PORT2_RABBITMQ}:15672"
+    networks:
+      - gradebook-net
 
   api-gateway:
     build:
@@ -135,6 +144,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -163,6 +173,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -191,6 +202,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -219,6 +231,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -247,6 +260,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -275,6 +289,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped
@@ -303,6 +318,7 @@ services:
     depends_on:
       - mongodb
       - postgres
+      - rabbitmq
     networks:
       - gradebook-net
     restart: unless-stopped

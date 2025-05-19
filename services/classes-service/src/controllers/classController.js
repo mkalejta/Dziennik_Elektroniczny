@@ -13,6 +13,7 @@ function validateClassId(classId) {
   }
 }
 
+
 async function getClasses(req, res) {
   try {
     const result = await pgClient.query('SELECT * FROM class ORDER BY id ASC');
@@ -61,7 +62,7 @@ async function getStudentsInClass(req, res) {
       'SELECT * FROM students_classes WHERE class_id = $1',
       [classId]
     );
-    
+
     const studentIds = result.rows.map(row => row.student_id);
 
     if (studentIds.length === 0) {

@@ -4,10 +4,10 @@ const gradeController = require('../controllers/gradeController');
 const checkRole = require(`${process.env.NODE_PATH}/middleware/checkRole`);
 
 router.get('/', gradeController.getAllGrades);
-router.post('/', gradeController.createGrade);
+router.post('/', checkRole('teacher'), gradeController.createGrade);
 router.get('/:gradeId', gradeController.getGradeById);
-router.put('/:gradeId', gradeController.updateGrade);
-router.delete('/:gradeId', gradeController.deleteGrade);
+router.put('/:gradeId', checkRole('teacher'), gradeController.updateGrade);
+router.delete('/:gradeId', checkRole('teacher'), gradeController.deleteGrade);
 router.get('/student/:studentId', gradeController.getGradesByStudentId);
 router.get('/parent/:parentId', gradeController.getGradesByParentId);
 router.get('/student/:studentId/subject/:subjectId', gradeController.getGradesByStudentIdAndSubjectId);

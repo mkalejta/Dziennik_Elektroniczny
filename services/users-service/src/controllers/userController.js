@@ -2,6 +2,7 @@ const User = require('../models/User');
 const pgClient = require('../db/pgClient');
 const axios = require('axios');
 const { getKeycloakAdminToken, createKeycloakUser, deleteUserFromKeycloak } = require('../utils/keycloak');
+const { publishUserDeleted, publishUserCreated } = require('../events/eventPublisher');
 
 
 async function getAllUsers(req, res) {
@@ -16,7 +17,7 @@ async function getAllUsers(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, surname, email, username, role } = req.body;
+    const { name, surname, email, username, role, classId, childId } = req.body;
 
     if (!name || !surname || !username || !role) {
         return res.status(400).send('Missing required fields');
@@ -54,6 +55,14 @@ async function createUser(req, res) {
             return res.status(500).send('Failed to create user in database');
         }
 
+        if (role === 'parent' && childId) {
+            await db.collection('parent_child').insertOne({
+                parentId: username,
+                childId
+            });
+        }
+
+        publishUserCreated({ _id: username, name, surname, role, classId });
         res.status(201).json({ message: 'User created successfully', temporaryPassword });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -88,6 +97,8 @@ async function deleteUser(req, res) {
         const realm = process.env.KEYCLOAK_REALM;
         const adminToken = await getKeycloakAdminToken();
 
+       const user = await db.collection('users').findOne({ _id: userId });
+
         // Usuń z Keycloak
         const kcUsers = await axios.get(
             `${keycloakUrl}/admin/realms/${realm}/users?username=${encodeURIComponent(userId)}`,
@@ -115,6 +126,7 @@ async function deleteUser(req, res) {
             return res.status(404).send('User not found in database');
         }
 
+        await publishUserDeleted(user);
         res.status(204).send();
     } catch (error) {
         console.error('Error deleting user:', error);

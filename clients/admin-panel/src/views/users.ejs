@@ -74,7 +74,7 @@
             <input type="text" class="form-control" id="addSurname" name="surname" required>
           </div>
           <div class="mb-3">
-            <label for="addUsername" class="form-label">Login</label>
+            <label for="addUsername" class="form-label">Username</label>
             <input type="text" class="form-control" id="addUsername" name="username" required>
           </div>
           <div class="mb-3">
@@ -87,6 +87,24 @@
               <option value="student">Uczeń</option>
               <option value="parent">Rodzic</option>
               <option value="teacher">Nauczyciel</option>
+            </select>
+          </div>
+          <div class="mb-3" id="classField" style="display: none;">
+            <label for="addClass" class="form-label">Klasa</label>
+            <select class="form-select" id="addClass" name="class">
+              <option value="">Wybierz klasę</option>
+              <% classes.forEach(cls => { %>
+                <option value="<%= cls %>"><%= cls %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3" id="childField" style="display: none;">
+            <label for="addChild" class="form-label">Dziecko</label>
+            <select class="form-select" id="addChild" name="childId">
+              <option value="">Wybierz dziecko</option>
+              <% users.filter(u => u.role === 'student').forEach(student => { %>
+                <option value="<%= student._id %>"><%= student.name %> <%= student.surname %> (<%= student._id %>)</option>
+              <% }) %>
             </select>
           </div>
         </div>
@@ -158,6 +176,11 @@
         email: form.email.value,
         role: form.role.value
       };
+      if (data.role === 'student') {
+        data.classId = form.class.value;
+      } else if (data.role === 'parent') {
+        data.childId = form.childId.value;
+      }
       // Zapisz filtr roli przed reloadem
       localStorage.setItem('users_role_filter', roleFilter.value);
       const res = await fetch('http://localhost:4000/users', {
@@ -171,6 +194,35 @@
         alert('Błąd podczas dodawania użytkownika');
       }
     });
+
+    // Pokazuj pole "Klasa" tylko dla roli student
+    const addRole = document.getElementById('addRole');
+    const classField = document.getElementById('classField');
+    const childField = document.getElementById('childField');
+    addRole.addEventListener('change', function() {
+      if (addRole.value === 'student') {
+        classField.style.display = '';
+        document.getElementById('addClass').required = true;
+        document.getElementById('addClass').disable = false;
+      } else {
+        classField.style.display = 'none';
+        document.getElementById('addClass').required = false;
+        document.getElementById('addClass').value = '';
+        document.getElementById('addClass').disable = true;
+      }
+      if (addRole.value === 'parent') {
+        childField.style.display = '';
+        document.getElementById('addChild').required = true;
+        document.getElementById('addChild').disable = false;
+      } else {
+        childField.style.display = 'none';
+        document.getElementById('addChild').required = false;
+        document.getElementById('addChild').value = '';
+        document.getElementById('addChild').disable = true;
+      }
+    });
+    // Wywołaj na starcie, jeśli modal jest otwarty domyślnie
+    addRole.dispatchEvent(new Event('change'));
   </script>
 </body>
 </html>

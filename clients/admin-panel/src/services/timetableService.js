@@ -27,10 +27,6 @@ const getLessons = async (req, res) => {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-    console.log('Timetable:', timetable.data);
-    console.log('Classes:', classes.data);
-    console.log('Teachers:', teachers);
-    console.log('Subjects:', subjects.data);
     res.render('timetable', {
       timetable: timetable.data, 
       classes: classes.data,

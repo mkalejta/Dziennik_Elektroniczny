@@ -36,6 +36,7 @@ async function createKeycloakUser({ name, surname, email, username, role }) {
 
     const temporaryPassword = generateTemporaryPassword();
 
+    // 1. Utwórz użytkownika
     const userPayload = {
         username,
         email,
@@ -49,9 +50,9 @@ async function createKeycloakUser({ name, surname, email, username, role }) {
                 temporary: true,
             },
         ],
-        realmRoles: [role],
     };
 
+    // Tworzenie użytkownika
     await axios.post(
         `${keycloakUrl}/admin/realms/${realm}/users`,
         userPayload,
@@ -61,6 +62,28 @@ async function createKeycloakUser({ name, surname, email, username, role }) {
                 'Content-Type': 'application/json',
             },
         }
+    );
+
+    // 2. Pobierz ID użytkownika
+    const kcUsers = await axios.get(
+        `${keycloakUrl}/admin/realms/${realm}/users?username=${encodeURIComponent(username)}`,
+        { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
+    if (!kcUsers.data.length) throw new Error('User not found after creation');
+    const userId = kcUsers.data[0].id;
+
+    // 3. Pobierz obiekt roli
+    const rolesRes = await axios.get(
+        `${keycloakUrl}/admin/realms/${realm}/roles/${role}`,
+        { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
+    const roleObj = rolesRes.data;
+
+    // 4. Przypisz rolę do użytkownika
+    await axios.post(
+        `${keycloakUrl}/admin/realms/${realm}/users/${userId}/role-mappings/realm`,
+        [roleObj],
+        { headers: { Authorization: `Bearer ${adminToken}` } }
     );
 
     return temporaryPassword;
