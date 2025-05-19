@@ -346,6 +346,29 @@ services:
       - keycloak
     networks:
       - gradebook-net
+  
+  reports-client:
+    build:
+      context: ./clients/reports-client
+      dockerfile: Dockerfile
+    container_name: reports-client
+    ports:
+      - "${PORT_REPORTS_CLIENT}:4001"
+    environment:
+      - API_GATEWAY_URL=${REPORTS_API_GATEWAY_URL}
+      - INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
+      - REALM=${KEYCLOAK_REALM}
+      - CLIENT_ID=${REPORTS_KEYCLOAK_CLIENT_ID}
+      - CLIENT_SECRET=${REPORTS_KEYCLOAK_CLIENT_SECRET}
+      - SHEET_ID=${SHEET_ID}
+    depends_on:
+      - api-gateway
+      - keycloak
+      - grades-service
+      - classes-service
+    networks:
+      - gradebook-net
+    restart: unless-stopped
 
 volumes:
   mongo_data:
