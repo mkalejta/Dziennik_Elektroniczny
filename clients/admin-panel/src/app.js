@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const RedisStore = require('connect-redis').default;
+const RedisStore = require('connect-redis')(session);
 const { createClient } = require('redis');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -14,9 +14,7 @@ dotenv.config();
 
 const app = express();
 
-const redisClient = createClient({
-  url: 'redis://redis:6379'
-});
+const redisClient = createClient({ url: 'redis://redis:6379' });
 redisClient.connect().catch(console.error);
 
 const redisStore = new RedisStore({
