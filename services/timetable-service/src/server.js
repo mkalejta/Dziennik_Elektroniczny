@@ -15,6 +15,7 @@ app.use(express.json());
   startEventListeners();
 
   app.use('/api/timetable', checkJwt, timetableRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_TIMETABLE_SERVICE || 8005;
   app.listen(PORT, () => {

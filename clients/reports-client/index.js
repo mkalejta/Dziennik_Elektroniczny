@@ -154,6 +154,8 @@ async function generateReport() {
   }
 }
 
+app.get('/health', (req, res) => res.send('OK'));
+
 app.post('/api/reports', async (req, res) => {
   try {
     await generateReport();

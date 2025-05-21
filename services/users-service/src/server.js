@@ -17,6 +17,7 @@ app.use(cors({
   app.locals.db = db;
 
   app.use('/api/users', checkJwt, userRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_USER_SERVICE || 8001;
   app.listen(PORT, () => {

@@ -85,6 +85,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - gradebook-net
+    restart: unless-stopped
   
   rabbitmq:
     image: rabbitmq:3-management
@@ -117,6 +126,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   users-service:
     build:
@@ -148,6 +162,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   grades-service:
     build:
@@ -177,6 +196,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   
   subjects-service:
     build:
@@ -206,6 +230,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   attendance-service:
     build:
@@ -235,6 +264,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   timetable-service:
     build:
@@ -264,6 +298,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   messages-service:
     build:
@@ -293,6 +332,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   classes-service:
     build:
@@ -322,6 +366,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     
   web-client:
     build:
@@ -329,19 +378,18 @@ services:
       dockerfile: Dockerfile
     container_name: web-client
     ports:
-      - "${PORT_WEB_CLIENT}:5173"
-    environment:
-      - VITE_API_URL=${VITE_API_URL}
-      - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
-      - VITE_KEYCLOAK_REALM=${VITE_KEYCLOAK_REALM}
-      - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
-      - VITE_PORT=5173
+      - "${PORT_WEB_CLIENT}:${PORT_NGINX}"
     depends_on:
       - api-gateway
       - keycloak
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   admin-panel:
     build:
@@ -361,8 +409,14 @@ services:
     depends_on:
       - api-gateway
       - keycloak
+      - redis
     networks:
       - gradebook-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   
   reports-client:
     build:
@@ -387,6 +441,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   mongo_data:

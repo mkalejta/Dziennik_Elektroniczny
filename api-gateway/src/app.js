@@ -20,6 +20,10 @@ app.get('/', (req, res) => {
   res.send('API Gateway działa');
 });
 
+app.get('/health', (req, res) => {
+  res.send('OK');
+});
+
 const PORT = process.env.API_GATEWAY_PORT || 8081;
 app.listen(PORT, () => {
   console.log(`API Gateway listening on port ${PORT}`);

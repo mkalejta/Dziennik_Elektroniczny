@@ -9,20 +9,16 @@ const app = express();
 app.use(express.json());
 
 (async () => {
-  try {
-    const db = await connectMongo();
-    app.locals.db = db;
+  const db = await connectMongo();
+  app.locals.db = db;
 
-    app.use('/api/classes', checkJwt, classRoutes);
+  startEventListeners();
 
-    startEventListeners();
+  app.use('/api/classes', checkJwt, classRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
-    const PORT = process.env.PORT_CLASS_SERVICE || 8007;
-    app.listen(PORT, () => {
-      console.log(`Class service running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Błąd podczas uruchamiania serwera:', error);
-    process.exit(1);
-  }
+  const PORT = process.env.PORT_CLASS_SERVICE || 8007;
+  app.listen(PORT, () => {
+    console.log(`Class service running on port ${PORT}`);
+  });
 })();

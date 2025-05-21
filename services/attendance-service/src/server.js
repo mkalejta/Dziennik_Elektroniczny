@@ -15,6 +15,7 @@ app.use(express.json());
   startEventListeners(db);
 
   app.use('/api/attendance', checkJwt, attendanceRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_ATTENDANCE_SERVICE || 8004;
   app.listen(PORT, () => {

@@ -15,6 +15,7 @@ app.use(express.json());
   startEventListeners();
 
   app.use('/api/grades', checkJwt, gradeRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_GRADE_SERVICE || 8002;
   app.listen(PORT, () => {

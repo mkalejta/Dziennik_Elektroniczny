@@ -1,5 +1,7 @@
 const express = require('express');
 const session = require('express-session');
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
 const path = require('path');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
@@ -12,10 +14,18 @@ dotenv.config();
 
 const app = express();
 
-const memoryStore = new session.MemoryStore();
+const redisClient = createClient({
+  url: 'redis://redis:6379'
+});
+redisClient.connect().catch(console.error);
+
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "sess:"
+});
 
 app.use(session({
-  store: memoryStore,
+  store: redisStore,
   secret: process.env.ADMIN_SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
@@ -32,6 +42,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/health', (req, res) => res.send('OK'));
 app.use('/', indexRoutes);
 app.use('/users', ensureValidToken, userRoutes);
 app.use('/timetable', ensureValidToken, timetableRoutes);

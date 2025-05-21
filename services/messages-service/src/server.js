@@ -15,6 +15,7 @@ app.use(express.json());
   startEventListeners(db);
 
   app.use('/api/messages', checkJwt, messageRoutes);
+  app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_MESSAGES_SERVICE || 8006;
   app.listen(PORT, () => {
