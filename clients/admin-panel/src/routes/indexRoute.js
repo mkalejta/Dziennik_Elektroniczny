@@ -65,8 +65,11 @@ router.get('/auth', async (req, res) => {
       req.session.refresh_token = refresh_token;
       req.session.token_expires_at = Date.now() + expires_in * 1000;
 
-
-      req.session.save();
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+        }
+      });
 
       return res.redirect('/');
     })

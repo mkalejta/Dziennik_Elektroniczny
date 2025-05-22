@@ -18,6 +18,7 @@ async function getAllUsers(req, res) {
 
 async function createUser(req, res) {
     const { name, surname, email, username, role, classId, childId } = req.body;
+    const { subject } = req.body.subject || {};
 
     if (!name || !surname || !username || !role) {
         return res.status(400).send('Missing required fields');
@@ -62,7 +63,7 @@ async function createUser(req, res) {
             });
         }
 
-        publishUserCreated({ _id: username, name, surname, role, classId });
+        publishUserCreated({ _id: username, name, surname, role, classId }, subject);
         res.status(201).json({ message: 'User created successfully', temporaryPassword });
     } catch (error) {
         console.error('Error creating user:', error);

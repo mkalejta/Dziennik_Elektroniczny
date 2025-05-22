@@ -14,6 +14,19 @@ async function handleUserDeleted(event) {
   }
 }
 
+async function handleUserCreated(event) {
+  const userId = event.payload.userId;
+  const role = event.payload.role;
+  // Dodaj przedmioty do bazy danych
+  if (role === 'teacher') {
+    const subject = event.payload.subject;
+    await pgClient.query(
+      `INSERT INTO subjects (id, name, teacher_id, class_id) VALUES ($1, $2, $3, $4)`,
+      [subject.id, subject.name, userId, subject.classId]
+    );
+  }
+}
+
 // Generyczna funkcja nasłuchująca
 async function listenForEvents(handlers) {
   const conn = await amqp.connect('amqp://rabbitmq');
@@ -35,7 +48,8 @@ async function listenForEvents(handlers) {
 
 function startEventListeners() {
   listenForEvents({
-    user_deleted: handleUserDeleted
+    user_deleted: handleUserDeleted,
+    user_created: handleUserCreated
   });
 }
 

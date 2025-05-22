@@ -15,7 +15,14 @@ const getUsers = async (req, res) => {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-    res.render('users', { users: users.data, classes: classes.data });
+    const subjects = await axios.get(`${API_GATEWAY_URL}/subjects`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    }).then(res => res.data.map(subject => ({
+      name: subject.name
+    })));
+    res.render('users', { users: users.data, classes: classes.data, subjects });
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ message: 'Internal server error' });

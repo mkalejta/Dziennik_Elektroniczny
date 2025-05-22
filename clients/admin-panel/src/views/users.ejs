@@ -107,6 +107,24 @@
               <% }) %>
             </select>
           </div>
+          <div class="mb-3" id="teacherClassField" style="display: none;">
+            <label for="teacherClass" class="form-label">Klasa</label>
+            <select class="form-select" id="teacherClass" name="classId">
+              <option value="">Wybierz klasę</option>
+              <% classes.forEach(cls => { %>
+                <option value="<%= cls %>"><%= cls %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3" id="teacherSubjectField" style="display: none;">
+            <label for="teacherSubject" class="form-label">Nazwa przedmiotu</label>
+            <select class="form-select" id="teacherSubject" name="subjectName">
+              <option value="">Wybierz przedmiot</option>
+              <% subjects.forEach(sub => { %>
+                <option value="<%= sub %>"><%= sub %></option>
+              <% }) %>
+            </select>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-success">Dodaj</button>
@@ -181,6 +199,14 @@
       } else if (data.role === 'parent') {
         data.childId = form.childId.value;
       }
+      if (data.role === 'teacher') {
+        const id = form.teacherSubject.value.slice(0, 3).toLowerCase() + form.teacherClass.value;
+        data.subject = {
+          id: id,
+          name: form.teacherSubject.value,
+          classId: form.teacherClass.value
+        };
+      }
       // Zapisz filtr roli przed reloadem
       localStorage.setItem('users_role_filter', roleFilter.value);
       const res = await fetch('http://localhost:4000/users', {
@@ -200,25 +226,45 @@
     const classField = document.getElementById('classField');
     const childField = document.getElementById('childField');
     addRole.addEventListener('change', function() {
+      // Student
       if (addRole.value === 'student') {
         classField.style.display = '';
         document.getElementById('addClass').required = true;
-        document.getElementById('addClass').disable = false;
+        document.getElementById('addClass').disabled = false;
       } else {
         classField.style.display = 'none';
         document.getElementById('addClass').required = false;
         document.getElementById('addClass').value = '';
-        document.getElementById('addClass').disable = true;
+        document.getElementById('addClass').disabled = true;
       }
+      // Parent
       if (addRole.value === 'parent') {
         childField.style.display = '';
         document.getElementById('addChild').required = true;
-        document.getElementById('addChild').disable = false;
+        document.getElementById('addChild').disabled = false;
       } else {
         childField.style.display = 'none';
         document.getElementById('addChild').required = false;
         document.getElementById('addChild').value = '';
-        document.getElementById('addChild').disable = true;
+        document.getElementById('addChild').disabled = true;
+      }
+      // Teacher
+      if (addRole.value === 'teacher') {
+        document.getElementById('teacherClassField').style.display = '';
+        document.getElementById('teacherClass').required = true;
+        document.getElementById('teacherClass').disabled = false;
+        document.getElementById('teacherSubjectField').style.display = '';
+        document.getElementById('teacherSubject').required = true;
+        document.getElementById('teacherSubject').disabled = false;
+      } else {
+        document.getElementById('teacherClassField').style.display = 'none';
+        document.getElementById('teacherClass').required = false;
+        document.getElementById('teacherClass').value = '';
+        document.getElementById('teacherClass').disabled = true;
+        document.getElementById('teacherSubjectField').style.display = 'none';
+        document.getElementById('teacherSubject').required = false;
+        document.getElementById('teacherSubject').value = '';
+        document.getElementById('teacherSubject').disabled = true;
       }
     });
     // Wywołaj na starcie, jeśli modal jest otwarty domyślnie

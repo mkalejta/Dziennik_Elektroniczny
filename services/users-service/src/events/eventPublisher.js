@@ -18,13 +18,14 @@ async function publishUserDeleted(user) {
     });
 }
 
-async function publishUserCreated(user) {
+async function publishUserCreated(user, subject) {
     await publishEvent({
         type: 'user_created',
         payload: {
             userId: user._id,
             role: user.role,
-            classId: user.classId
+            classId: user.classId,
+            subject: subject
         }
     });
 }
