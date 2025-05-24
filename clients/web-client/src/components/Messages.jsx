@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { Box, List, ListItemButton, ListItemText, Typography, Divider, TextField, Button, Paper } from "@mui/material";
+import { Box, List, ListItemButton, ListItemText, Typography, Divider, TextField, Button, Paper, MenuItem, Select } from "@mui/material";
 import { useMessages } from "../contexts/MessagesContext";
 import { useUser } from "../contexts/UserContext";
 
 export default function Messages() {
-  const { conversations, selectedConversation, setSelectedConversation, sendMessage, newConversation } =
-    useMessages();
-  const { user } = useUser();
+  const { conversations, selectedConversation, setSelectedConversation, sendMessage, newConversation, availableUsers, getUserById } = useMessages();
   const [newMessage, setNewMessage] = useState("");
-  const [newUserId, setNewUserId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const { user } = useUser();
 
   const handleConversationSelect = (conversation) => {
     setSelectedConversation(conversation);
@@ -22,11 +21,13 @@ export default function Messages() {
   };
 
   const handleCreateConversation = () => {
-    if (newUserId.trim()) {
-      newConversation(newUserId.trim());
-      setNewUserId("");
+    if (selectedUserId) {
+      newConversation(selectedUserId);
+      setSelectedUserId("");
     }
   };
+
+  console.log("Conversations:", conversations);
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -35,28 +36,26 @@ export default function Messages() {
           Twoje konwersacje
         </Typography>
         <Box sx={{ mb: 2 }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            placeholder="Wpisz ID osoby..."
-            value={newUserId}
-            onChange={(e) => setNewUserId(e.target.value)}
-          />
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            sx={{ mt: 1 }}
-            onClick={handleCreateConversation}
-          >
+          <Select fullWidth value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} displayEmpty>
+            <MenuItem value="" disabled>
+              Wybierz użytkownika
+            </MenuItem>
+            {availableUsers.map((user) => (
+              <MenuItem key={user._id} value={user._id}>
+                {user.name} {user.surname}
+              </MenuItem>
+            ))}
+          </Select>
+          <Button fullWidth variant="contained" color="primary" sx={{ mt: 1 }} onClick={handleCreateConversation} disabled={!selectedUserId}>
             Utwórz
           </Button>
         </Box>
         <List>
           {conversations.map((conversation) => {
-            const personId =
-              user.role === "teacher" ? conversation.personId : conversation.teacherId;
+            // Sprawdź, czy zalogowany użytkownik jest teacherId czy personId
+            const isTeacher = user.username === conversation.teacherId;
+            const otherUserId = isTeacher ? conversation.personId : conversation.teacherId;
+            const otherUser = getUserById(otherUserId);
 
             return (
               <ListItemButton
@@ -65,31 +64,10 @@ export default function Messages() {
                 onClick={() => handleConversationSelect(conversation)}
               >
                 <ListItemText
-                  primary={
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Paper
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50%",
-                          backgroundColor: "#1976d2",
-                          color: "#fff",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {personId.charAt(0).toUpperCase()}
-                      </Paper>
-                      {personId}
-                    </Box>
-                  }
+                  primary={`Rozmowa z: ${otherUser ? `${otherUser.name} ${otherUser.surname} (${otherUser.role})` : "Nieznany użytkownik"}`}
                   secondary={`Ostatnia wiadomość: ${
                     conversation.messages.length > 0
-                      ? new Date(
-                          conversation.messages[conversation.messages.length - 1].sent
-                        ).toLocaleString()
+                      ? new Date(conversation.messages[conversation.messages.length - 1].sent).toLocaleString()
                       : "Brak wiadomości"
                   }`}
                 />
@@ -104,9 +82,12 @@ export default function Messages() {
           <>
             <Typography variant="h6" gutterBottom>
               Rozmowa z:{" "}
-              {user.role === "teacher"
-                ? selectedConversation.personId
-                : selectedConversation.teacherId}
+              {(() => {
+                const isTeacher = user.username === selectedConversation.teacherId;
+                const otherUserId = isTeacher ? selectedConversation.personId : selectedConversation.teacherId;
+                const otherUser = getUserById(otherUserId);
+                return otherUser ? `${otherUser.name} ${otherUser.surname} (${otherUser.role})` : "Nieznany użytkownik";
+              })()}
             </Typography>
             <Box
               sx={{
@@ -122,17 +103,12 @@ export default function Messages() {
                   key={index}
                   sx={{
                     p: 2,
-                    alignSelf:
-                      message.author === user.username ? "flex-end" : "flex-start",
-                    backgroundColor:
-                      message.author === user.username ? "#d0e7ff" : "#f0f0f0",
+                    alignSelf: message.author === user.username ? "flex-end" : "flex-start",
+                    backgroundColor: message.author === user.username ? "#d0e7ff" : "#f0f0f0",
                   }}
                 >
                   <Typography variant="body2">{message.content}</Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ display: "block", textAlign: "right" }}
-                  >
+                  <Typography variant="caption" sx={{ display: "block", textAlign: "right" }}>
                     {new Date(message.sent).toLocaleString()}
                   </Typography>
                 </Paper>

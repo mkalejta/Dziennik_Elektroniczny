@@ -9,6 +9,7 @@ export function MessagesProvider({ children }) {
   const { user } = useUser();
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [conversations, setConversations] = useState([]);
+  const [availableUsers, setAvailableUsers] = useState([]);
 
   const fetchedConversations = useFetch(
     user?.role === "teacher"
@@ -23,6 +24,30 @@ export function MessagesProvider({ children }) {
       setConversations(fetchedConversations);
     }
   }, [fetchedConversations]);
+
+  // Pobierz listę użytkowników na podstawie roli
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/${user?.username}/receivers`, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+        setAvailableUsers(res.data);
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
+      }
+    };
+
+    if (user) {
+      fetchUsers();
+    }
+  }, [user]);
+
+  const getUserById = (userId) => {
+    return availableUsers.find((u) => u._id === userId);
+  };
 
   const sendMessage = async (conversationId, content) => {
     try {
@@ -92,7 +117,9 @@ export function MessagesProvider({ children }) {
         selectedConversation,
         setSelectedConversation,
         sendMessage,
-        newConversation, // Dodano nową funkcję
+        newConversation,
+        availableUsers,
+        getUserById
       }}
     >
       {children}

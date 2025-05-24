@@ -69,7 +69,7 @@
       "description" : "${role_default-roles}",
       "composite" : true,
       "composites" : {
-        "realm" : [ "offline_access", "admin", "uma_authorization" ],
+        "realm" : [ "offline_access", "uma_authorization" ],
         "client" : {
           "account" : [ "manage-account", "view-profile" ]
         }
@@ -471,28 +471,6 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
-    "id" : "3162e34d-cb3f-4fd1-8cfa-6c7a25132912",
-    "username" : "jlentil",
-    "firstName" : "Jan",
-    "lastName" : "Lentil",
-    "email" : "jlentil@gmail.com",
-    "emailVerified" : false,
-    "createdTimestamp" : 1747684634767,
-    "enabled" : true,
-    "totp" : false,
-    "credentials" : [ {
-      "id" : "7479340a-3a4e-4f8e-a507-4f1f19c277a9",
-      "type" : "password",
-      "createdDate" : 1747684635098,
-      "secretData" : "{\"value\":\"urwdXhovfb+QHY1Ev9rl9HG/yFLw+Z+r64c1P7cpzfpJvylradFp4Bl0hCmnuuNlJpZEDJkQjhbBEWXR80iE6g==\",\"salt\":\"C7eww7JgnnmtnHuy6KNADw==\",\"additionalParameters\":{}}",
-      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-    } ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ "UPDATE_PASSWORD" ],
-    "realmRoles" : [ "default-roles-gradebook", "student" ],
-    "notBefore" : 0,
-    "groups" : [ ]
-  }, {
     "id" : "7dfbdc27-9401-4143-8ddd-891c9866eb75",
     "username" : "parent1",
     "firstName" : "Jan",
@@ -606,6 +584,29 @@
       "userLabel" : "My password",
       "createdDate" : 1746945052960,
       "secretData" : "{\"value\":\"pMdc52gntg7/Aeejp5Bt6H4iMJy4Yrp7kMflN79YBA2v8H5Cvqlaa5N9crgfWfSrwG9lcP7DAwZd8BI/O4wwDQ==\",\"salt\":\"5g+SthHHUN8T7ueA33gKsg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-gradebook", "teacher" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "e0c9c74c-5572-4d94-9ab5-aa59e3b880f8",
+    "username" : "teacher7",
+    "firstName" : "Jan",
+    "lastName" : "Zieliński",
+    "email" : "jzielinski@gmail.com",
+    "emailVerified" : true,
+    "createdTimestamp" : 1748109396015,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "6ac05402-e2c4-4cd6-804f-adaa4b8aaf6e",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1748109507447,
+      "secretData" : "{\"value\":\"+cN3DEwsxJHLLkyHTj3NPduiUFSuC9+RgGLCFz99fcZRM6R9UwJwTerHSRPQA1/iOEYWOkPTPrHmY6vhITk8VQ==\",\"salt\":\"O91/4d0jTtyNnxs83W71oA==\",\"additionalParameters\":{}}",
       "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
     } ],
     "disableableCredentialTypes" : [ ],

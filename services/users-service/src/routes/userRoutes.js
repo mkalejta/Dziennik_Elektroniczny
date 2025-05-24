@@ -8,5 +8,6 @@ router.post('/', checkRole('admin'), userController.createUser);
 router.get('/:id', userController.getUser);
 router.delete('/:id', checkRole('admin'), userController.deleteUser);
 router.get('/:id/class', userController.getUserClass);
+router.get('/:id/receivers', userController.getPossibleMesageReceivers);
 
 module.exports = router;

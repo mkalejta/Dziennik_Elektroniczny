@@ -160,10 +160,31 @@ async function getUserClass(req, res) {
     }
 }
 
+async function getPossibleMesageReceivers(req, res) {
+    const userId = req.params.id;
+    try {
+        const db = req.app.locals.db;
+        const user = await db.collection('users').findOne({ _id: userId });
+        let users = [];
+
+        if (user?.role === 'teacher') {
+            users = await db.collection('users').find({ role: { $in: ['student', 'parent'] } }).toArray();
+        } else if (['student', 'parent'].includes(user?.role)) {
+            users = await db.collection('users').find({ role: 'teacher' }).toArray();
+        }
+        
+        res.json(users.map(user => new User(user)));
+    } catch (error) {
+        console.error('Error fetching possible message receivers:', error);
+        res.status(500).send('Internal server error');
+    }
+}
+
 module.exports = {
     getAllUsers,
     createUser,
     getUser,
     deleteUser,
-    getUserClass
+    getUserClass,
+    getPossibleMesageReceivers
 };
