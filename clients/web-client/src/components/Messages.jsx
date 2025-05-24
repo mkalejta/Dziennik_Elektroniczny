@@ -27,8 +27,6 @@ export default function Messages() {
     }
   };
 
-  console.log("Conversations:", conversations);
-
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
       <Box sx={{ width: "30%", borderRight: "1px solid #ccc", p: 2 }}>
