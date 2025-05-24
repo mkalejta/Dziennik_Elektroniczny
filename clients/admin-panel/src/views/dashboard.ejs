@@ -70,12 +70,41 @@
       </div>
     </div>
     <% if (isAuthenticated) { %>
+      <div id="reportStatus" class="mb-3"></div>
       <button id="generateReportBtn" class="btn btn-warning center">Generuj raport ocen</button>
+      <ul id="reportsList" class="mt-4"></ul>
       <script>
-        document.getElementById('generateReportBtn').onclick = async function() {
-          const res = await fetch('http://localhost:8081/api/reports', { method: 'POST' });
-          alert(await res.text());
+        async function loadReports() {
+          const res = await fetch('http://localhost:8081/api/reports/list');
+          const files = await res.json();
+          const list = document.getElementById('reportsList');
+          list.innerHTML = '';
+          files.forEach(file => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="http://localhost:8081/api/reports/${file}" target="_blank">${file}</a>`;
+            list.appendChild(li);
+          });
         }
+
+        document.getElementById('generateReportBtn').onclick = async function() {
+          const status = document.getElementById('reportStatus');
+          status.textContent = 'Generowanie raportu... Proszę czekać.';
+          try {
+            const res = await fetch('http://localhost:8081/api/reports', { method: 'POST' });
+            if (res.ok) {
+              const data = await res.json();
+              status.innerHTML = `Raport wygenerowany: <a href="http://localhost:8081/api/reports/${data.filename}" target="_blank">${data.filename}</a>`;
+              await loadReports();
+            } else {
+              status.textContent = await res.text();
+            }
+          } catch (e) {
+            status.textContent = 'Błąd podczas generowania raportu';
+          }
+        };
+
+        // Załaduj listę raportów na starcie
+        loadReports();
       </script>
     <% } %>
   </div>

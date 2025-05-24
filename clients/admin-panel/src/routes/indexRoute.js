@@ -60,18 +60,20 @@ router.get('/auth', async (req, res) => {
   axios.post(tokenEndpoint, params)
     .then(result => {
       const { access_token, refresh_token, expires_in } = result.data;
+      console.log(result.data);
 
       req.session.access_token = access_token;
       req.session.refresh_token = refresh_token;
       req.session.token_expires_at = Date.now() + expires_in * 1000;
-
+      if (typeof expires_in !== 'number') {
+        throw new Error('expires_in nie jest liczbą');
+      }
       req.session.save((err) => {
         if (err) {
-          console.error('Session save error:', err);
+          console.error('Błąd podczas zapisu sesji:', err);
         }
       });
-
-      return res.redirect('/');
+      res.redirect("/");
     })
     .catch(error => {
       console.error('Error fetching token:', error);

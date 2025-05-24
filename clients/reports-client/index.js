@@ -1,10 +1,11 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const { appendToSheet, createSheetIfNotExists, clearSheet } = require('./utils/googleSheets');
+const { appendToSheet, createSheetIfNotExists, clearSheet, downloadSheetAsXlsx } = require('./utils/googleSheets');
 const express = require('express');
 const app = express();
-
+const fs = require('fs');
+const path = require('path');
 
 app.use(cors({
   origin: "http://localhost:4000",
@@ -81,7 +82,7 @@ function calculateOverallAverage(subjectAverages) {
   return Number((values.reduce((a, b) => a + b, 0) / values.length).toFixed(2));
 }
 
-async function generateReport() {
+async function generateReport(filepath) {
   const token = await getAccessToken();
   const classes = await fetchClasses(token);
 
@@ -158,11 +159,29 @@ app.get('/health', (req, res) => res.send('OK'));
 
 app.post('/api/reports', async (req, res) => {
   try {
-    await generateReport();
-    res.status(200).send('Raport wygenerowany!');
+    const filename = `raport_${Date.now()}.xlsx`;
+    const filepath = path.join(__dirname, 'reports', filename);
+    await generateReport(filepath);
+    await downloadSheetAsXlsx(SHEET_ID, filepath);
+    res.status(200).json({ filename });
   } catch (err) {
     res.status(500).send('Błąd generowania raportu: ' + err.message);
   }
+});
+
+app.get('/api/reports/list', (req, res) => {
+  const dir = path.join(__dirname, 'reports');
+  fs.readdir(dir, (err, files) => {
+    if (err) return res.status(500).send('Błąd odczytu raportów');
+    // sortuj od najnowszego
+    files.sort((a, b) => b.localeCompare(a));
+    res.json(files);
+  });
+});
+
+app.get('/api/reports/:filename', (req, res) => {
+  const filepath = path.join(__dirname, 'reports', req.params.filename);
+  res.download(filepath);
 });
 
 app.listen(PORT, () => {
