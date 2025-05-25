@@ -105,9 +105,7 @@ services:
       - gradebook-net
 
   api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+    image: mkalejta/api-gateway:latest
     container_name: api-gateway
     ports:
       - "${PORT_API_GATEWAY}:8081"
@@ -359,9 +357,7 @@ services:
       retries: 5
     
   web-client:
-    build:
-      context: ./clients/web-client
-      dockerfile: Dockerfile
+    image: mkalejta/web-client:latest
     container_name: web-client
     ports:
       - "${PORT_WEB_CLIENT}:${PORT_NGINX}"
@@ -378,9 +374,7 @@ services:
       retries: 5
 
   admin-panel:
-    build:
-      context: ./clients/admin-panel
-      dockerfile: Dockerfile
+    image: mkalejta/admin-panel:latest
     container_name: admin-panel
     ports:
       - "${PORT_ADMIN_PANEL}:4000"
@@ -405,9 +399,7 @@ services:
       retries: 5
   
   reports-client:
-    build:
-      context: ./clients/reports-client
-      dockerfile: Dockerfile
+    image: mkalejta/reports-client:latest
     container_name: reports-client
     ports:
       - "${PORT_REPORTS_CLIENT}:4001"

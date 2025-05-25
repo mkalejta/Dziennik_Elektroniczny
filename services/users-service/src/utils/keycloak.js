@@ -1,5 +1,7 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 dotenv.config();
 
 function generateTemporaryPassword() {
@@ -84,6 +86,12 @@ async function createKeycloakUser({ name, surname, email, username, role }) {
         `${keycloakUrl}/admin/realms/${realm}/users/${userId}/role-mappings/realm`,
         [roleObj],
         { headers: { Authorization: `Bearer ${adminToken}` } }
+    );
+
+    // Zapisz utworzonego użytkownika do pliku CSV
+    fs.appendFileSync(
+        path.join(__dirname, '../../created-users.csv'),
+        `${username},${temporaryPassword}\n`
     );
 
     return temporaryPassword;
