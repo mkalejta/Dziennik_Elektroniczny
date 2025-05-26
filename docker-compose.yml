@@ -29,9 +29,9 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     environment:
+      - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql:ro
@@ -39,7 +39,7 @@ services:
       - gradebook-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,6 +94,11 @@ services:
     networks:
       - gradebook-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   
   rabbitmq:
     image: rabbitmq:3-management
@@ -142,11 +147,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
       - ADMIN_KEYCLOAK_CLIENT_ID=${ADMIN_KEYCLOAK_CLIENT_ID}
       - ADMIN_KEYCLOAK_CLIENT_SECRET=${ADMIN_KEYCLOAK_CLIENT_SECRET}
     volumes:
@@ -176,11 +177,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:
@@ -208,11 +205,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:
@@ -240,11 +233,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:
@@ -272,11 +261,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:
@@ -304,11 +289,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:
@@ -336,11 +317,7 @@ services:
       - NODE_PATH=${NODE_PATH}
       - KEYCLOAK_INTERNAL_URL=${KEYCLOAK_INTERNAL_URL}
       - KEYCLOAK_REALM=${KEYCLOAK_REALM}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_URI=${POSTGRES_URI}
     volumes:
       - ./shared:/usr/src/app/shared:ro
     depends_on:

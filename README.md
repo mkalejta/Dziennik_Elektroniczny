@@ -105,6 +105,28 @@ docker-compose logs -f
 - **Loginy i tymczasowe hasła użytkowników:**  
   W pliku `services/users-service/created-users.csv`
 
+### 6. Skrypt czyszczący tymczasowe hasła użytkowników
+
+W katalogu `scripts/` znajduje się skrypt `clean-temporary-passwords.js`, który służy do **automatycznego usuwania z pliku `created-users.csv` tych użytkowników, którzy zmienili już swoje tymczasowe hasło w Keycloak**.
+
+#### Jak działa?
+
+- Skrypt sprawdza w Keycloak, czy użytkownik ma wymuszoną akcję zmiany hasła (`UPDATE_PASSWORD` w polu `requiredActions`).
+- Jeśli użytkownik NIE musi już zmieniać hasła (czyli hasło zostało zmienione), jego dane są usuwane z pliku CSV.
+- Dzięki temu plik `created-users.csv` zawiera tylko tych użytkowników, którzy nadal mają aktywne tymczasowe hasło.
+
+#### Jak uruchomić?
+
+1. Upewnij się, że masz zainstalowane zależności (w katalogu /scripts):
+   ```sh
+   npm install axios dotenv
+   ```
+2. Uruchom skrypt:
+   ```sh
+   node scripts/clean-temporary-passwords.js
+   ```
+3. Po wykonaniu, plik `services/users-service/created-users.csv` zostanie zaktualizowany.
+
 ---
 
 ## ℹ️ Dodatkowe informacje
