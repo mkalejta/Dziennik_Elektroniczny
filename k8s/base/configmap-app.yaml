@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  PORT_MONGO: "27017"
+  MONGO_DB_NAME: gradebookDB
+  MONGO_URI: mongodb://admin:adminpassword@mongodb:27017
+  POSTGRES_DB: gradebookdb
+  POSTGRES_PORT: "5432"
+  POSTGRES_URI: postgresql://admin:adminpassword@postgres:5432/gradebookdb
+  KEYCLOAK_DB_NAME: keycloak
+  PORT_KEYCLOAK_DB: "5432"
+  PORT_KEYCLOAK: "8080"
+  KEYCLOAK_REALM: gradebook
+  KEYCLOAK_PUBLIC_URL: http://localhost:8080
+  KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+  PORT_API_GATEWAY: "8081"
+  PORT_USERS_SERVICE: "8001"
+  PORT_GRADES_SERVICE: "8002"
+  PORT_SUBJECTS_SERVICE: "8003"
+  PORT_ATTENDANCE_SERVICE: "8004"
+  PORT_TIMETABLE_SERVICE: "8005"
+  PORT_MESSAGES_SERVICE: "8006"
+  PORT_CLASS_SERVICE: "8007"
+  PORT_WEB_CLIENT: "5173"
+  PORT_NGINX: "80"
+  PORT_ADMIN_PANEL: "4000"
+  ADMIN_KEYCLOAK_REALM: gradebook
+  ADMIN_KEYCLOAK_CLIENT_ID: admin-client
+  ADMIN_API_GATEWAY_URL: http://api-gateway:8081/api
+  PORT_REPORTS_CLIENT: "4001"
+  REPORTS_API_GATEWAY_URL: http://api-gateway:8081/api
+  REPORTS_KEYCLOAK_CLIENT_ID: reports-client
+  SHEET_ID: 1pG6oU6zTBOamVikDFtVAgG9TMMXv5hV67FxU5AgXenk
+  PORT_RABBITMQ: "5672"
+  PORT2_RABBITMQ: "15672"
+  NODE_PATH: /usr/src/app/shared

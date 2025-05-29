@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: admin-panel
+  name: admin-panel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: admin-panel
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: admin-panel
+    spec:
+      containers:
+        - env:
+            - name: ADMIN_API_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_API_GATEWAY_URL
+            - name: ADMIN_KEYCLOAK_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_KEYCLOAK_CLIENT_ID
+            - name: ADMIN_KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ADMIN_KEYCLOAK_CLIENT_SECRET
+            - name: ADMIN_KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_KEYCLOAK_REALM
+            - name: ADMIN_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ADMIN_SESSION_SECRET
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_PUBLIC_URL
+          image: mkalejta/admin-panel:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:4000/health
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: admin-panel
+          ports:
+            - containerPort: 4000
+              protocol: TCP
+      restartPolicy: Always

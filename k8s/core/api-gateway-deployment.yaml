@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: api-gateway
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api-gateway
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: api-gateway
+    spec:
+      containers:
+        - env:
+            - name: PORT_API_GATEWAY
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_API_GATEWAY
+            - name: PORT_ATTENDANCE_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_ATTENDANCE_SERVICE
+            - name: PORT_CLASS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_CLASS_SERVICE
+            - name: PORT_GRADES_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_GRADES_SERVICE
+            - name: PORT_MESSAGES_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_MESSAGES_SERVICE
+            - name: PORT_REPORTS_CLIENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_REPORTS_CLIENT
+            - name: PORT_SUBJECTS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_SUBJECTS_SERVICE
+            - name: PORT_TIMETABLE_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_TIMETABLE_SERVICE
+            - name: PORT_USERS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_USERS_SERVICE
+          image: mkalejta/api-gateway:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:8081/
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: api-gateway
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+      restartPolicy: Always

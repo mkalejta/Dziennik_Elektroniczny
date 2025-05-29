@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: web-client
+  name: web-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: web-client
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: web-client
+    spec:
+      containers:
+        - env:
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_PUBLIC_URL
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: PORT_WEB_CLIENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_WEB_CLIENT
+          image: mkalejta/web-client:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost/
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: web-client
+          ports:
+            - containerPort: 80
+              protocol: TCP
+      restartPolicy: Always

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: timetable-service
+  name: timetable-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: timetable-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: timetable-service
+    spec:
+      containers:
+        - env:
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_DB_NAME
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_URI
+            - name: NODE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NODE_PATH
+            - name: PORT_TIMETABLE_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_TIMETABLE_SERVICE
+            - name: POSTGRES_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_URI
+          image: mkalejta/timetable-service:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:8005/health
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: timetable-service
+          ports:
+            - containerPort: 8005
+              protocol: TCP
+      restartPolicy: Always

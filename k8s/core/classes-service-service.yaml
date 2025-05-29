@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: classes-service
+  name: classes-service
+spec:
+  ports:
+    - name: "8007"
+      port: 8007
+      targetPort: 8007
+  selector:
+    io.kompose.service: classes-service
