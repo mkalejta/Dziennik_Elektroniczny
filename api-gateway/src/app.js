@@ -24,7 +24,7 @@ app.get('/health', (req, res) => {
   res.send('OK');
 });
 
-const PORT = process.env.API_GATEWAY_PORT || 8081;
-app.listen(PORT, () => {
+const PORT = process.env.PORT_API_GATEWAY || 8081;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`API Gateway listening on port ${PORT}`);
 });

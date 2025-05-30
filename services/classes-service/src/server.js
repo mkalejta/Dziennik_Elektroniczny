@@ -18,7 +18,7 @@ app.use(express.json());
   app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_CLASS_SERVICE || 8007;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Class service running on port ${PORT}`);
   });
 })();

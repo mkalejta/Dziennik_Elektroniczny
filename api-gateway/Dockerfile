@@ -1,7 +1,7 @@
 # Etap 1: Instalacja zależności (tylko produkcyjnych)
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json ./
+COPY api-gateway/package.json ./
 RUN npm install --production
 
 # Etap 2: Obraz produkcyjny
@@ -13,7 +13,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=deps /app/node_modules ./node_modules
 
-COPY . .
+COPY api-gateway/. .
 
 EXPOSE 8081
 

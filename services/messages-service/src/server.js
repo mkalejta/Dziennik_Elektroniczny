@@ -18,7 +18,7 @@ app.use(express.json());
   app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_MESSAGES_SERVICE || 8006;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Messages service running on port ${PORT}`);
   });
 })();

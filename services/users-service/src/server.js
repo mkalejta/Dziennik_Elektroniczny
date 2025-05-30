@@ -20,7 +20,7 @@ app.use(cors({
   app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_USER_SERVICE || 8001;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`User service running on port ${PORT}`);
   });
 })();

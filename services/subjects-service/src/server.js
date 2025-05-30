@@ -18,7 +18,7 @@ app.use(express.json());
   app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_SUBJECTS_SERVICE || 8003;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Subjects service running on port ${PORT}`);
   });
 })();

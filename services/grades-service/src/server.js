@@ -18,7 +18,7 @@ app.use(express.json());
   app.get('/health', (req, res) => res.send('OK'));
 
   const PORT = process.env.PORT_GRADE_SERVICE || 8002;
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Grade service running on port ${PORT}`);
   });
 })();
