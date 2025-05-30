@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.36.0 (ae2a39403)
   labels:
     io.kompose.service: keycloak
   name: keycloak
@@ -16,9 +13,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
         io.kompose.service: keycloak
     spec:
@@ -35,7 +29,7 @@ spec:
                   name: app-secrets
                   key: KEYCLOAK_DB_PASSWORD
             - name: KC_DB_URL
-              value: jdbc:postgresql://keycloak_postgres:5432/keycloak
+              value: jdbc:postgresql://keycloak-postgres:5432/keycloak
             - name: KC_DB_USERNAME
               valueFrom:
                 secretKeyRef:

@@ -41,8 +41,9 @@ spec:
                 - pg_isready
                 - -U
                 - keycloak
-            failureThreshold: 5
+            initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 5
             timeoutSeconds: 5
           volumeMounts:
             - mountPath: /var/lib/postgresql/data

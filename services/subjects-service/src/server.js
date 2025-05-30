@@ -15,7 +15,7 @@ app.use(express.json());
   startEventListeners();
 
   app.use('/api/subjects', checkJwt, subjectRoutes);
-  app.get('/health', (req, res) => res.send('OK'));
+  app.get('/health', (req, res) => res.sendStatus(200));
 
   const PORT = process.env.PORT_SUBJECTS_SERVICE || 8003;
   app.listen(PORT, '0.0.0.0', () => {

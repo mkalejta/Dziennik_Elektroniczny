@@ -24,51 +24,50 @@ spec:
     spec:
       containers:
         - env:
-            - name: KEYCLOAK_INTERNAL_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: KEYCLOAK_INTERNAL_URL
-            - name: KEYCLOAK_REALM
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: KEYCLOAK_REALM
-            - name: MONGO_DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: MONGO_DB_NAME
-            - name: MONGO_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: MONGO_URI
-            - name: NODE_PATH
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: NODE_PATH
-            - name: PORT_TIMETABLE_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_TIMETABLE_SERVICE
-            - name: POSTGRES_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: POSTGRES_URI
+          - name: KEYCLOAK_INTERNAL_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: KEYCLOAK_INTERNAL_URL
+          - name: KEYCLOAK_REALM
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: KEYCLOAK_REALM
+          - name: MONGO_DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: MONGO_DB_NAME
+          - name: MONGO_URI
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: MONGO_URI
+          - name: NODE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: NODE_PATH
+          - name: PORT_TIMETABLE_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_TIMETABLE_SERVICE
+          - name: POSTGRES_URI
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: POSTGRES_URI
           image: mkalejta/timetable-service:latest
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:8005/health
-            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 30
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           name: timetable-service
           ports:
             - containerPort: 8005

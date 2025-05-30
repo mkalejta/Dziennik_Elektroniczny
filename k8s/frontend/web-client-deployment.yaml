@@ -48,7 +48,7 @@ spec:
               command:
                 - curl
                 - -f
-                - http://localhost/
+                - http://localhost:5173/
             failureThreshold: 5
             periodSeconds: 30
             timeoutSeconds: 10

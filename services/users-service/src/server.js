@@ -17,9 +17,9 @@ app.use(cors({
   app.locals.db = db;
 
   app.use('/api/users', checkJwt, userRoutes);
-  app.get('/health', (req, res) => res.send('OK'));
+  app.get('/health', (req, res) => res.sendStatus(200));
 
-  const PORT = process.env.PORT_USER_SERVICE || 8001;
+  const PORT = process.env.PORT_USERS_SERVICE || 8001;
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`User service running on port ${PORT}`);
   });

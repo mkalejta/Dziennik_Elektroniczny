@@ -45,6 +45,6 @@ app.use('/', indexRoutes);
 app.use('/users', ensureValidToken, userRoutes);
 app.use('/timetable', ensureValidToken, timetableRoutes);
 
-app.listen(4000, () => {
+app.listen(4000, '0.0.0.0', () => {
   console.log('Admin panel SSR running on http://localhost:4000');
 });

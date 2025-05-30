@@ -19,61 +19,60 @@ spec:
     spec:
       containers:
         - env:
-            - name: PORT_API_GATEWAY
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_API_GATEWAY
-            - name: PORT_ATTENDANCE_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_ATTENDANCE_SERVICE
-            - name: PORT_CLASS_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_CLASS_SERVICE
-            - name: PORT_GRADES_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_GRADES_SERVICE
-            - name: PORT_MESSAGES_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_MESSAGES_SERVICE
-            - name: PORT_REPORTS_CLIENT
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_REPORTS_CLIENT
-            - name: PORT_SUBJECTS_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_SUBJECTS_SERVICE
-            - name: PORT_TIMETABLE_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_TIMETABLE_SERVICE
-            - name: PORT_USERS_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_USERS_SERVICE
+          - name: PORT_API_GATEWAY
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_API_GATEWAY
+          - name: PORT_ATTENDANCE_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_ATTENDANCE_SERVICE
+          - name: PORT_CLASS_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_CLASS_SERVICE
+          - name: PORT_GRADES_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_GRADES_SERVICE
+          - name: PORT_MESSAGES_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_MESSAGES_SERVICE
+          - name: PORT_REPORTS_CLIENT
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_REPORTS_CLIENT
+          - name: PORT_SUBJECTS_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_SUBJECTS_SERVICE
+          - name: PORT_TIMETABLE_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_TIMETABLE_SERVICE
+          - name: PORT_USERS_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_USERS_SERVICE
           image: mkalejta/api-gateway:latest
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:8081/
-            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           name: api-gateway
           ports:
             - containerPort: 8081

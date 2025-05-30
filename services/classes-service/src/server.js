@@ -15,7 +15,7 @@ app.use(express.json());
   startEventListeners();
 
   app.use('/api/classes', checkJwt, classRoutes);
-  app.get('/health', (req, res) => res.send('OK'));
+  app.get('/health', (req, res) => res.sendStatus(200));
 
   const PORT = process.env.PORT_CLASS_SERVICE || 8007;
   app.listen(PORT, '0.0.0.0', () => {

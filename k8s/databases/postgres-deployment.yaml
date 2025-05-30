@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: mkalejta/postgres-custom:latest
+          image: postgres:16
           env:
             - name: POSTGRES_DB
               valueFrom:
@@ -43,14 +43,20 @@ spec:
                 - admin
                 - -d
                 - gradebookdb
+            initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 5
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
+            - mountPath: /docker-entrypoint-initdb.d/
+              name: postgres-init
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-data
+        - name: postgres-init
+          configMap:
+            name: postgres-init-script
             

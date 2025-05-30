@@ -24,61 +24,60 @@ spec:
     spec:
       containers:
         - env:
-            - name: ADMIN_KEYCLOAK_CLIENT_ID
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: ADMIN_KEYCLOAK_CLIENT_ID
-            - name: ADMIN_KEYCLOAK_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: ADMIN_KEYCLOAK_CLIENT_SECRET
-            - name: KEYCLOAK_INTERNAL_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: KEYCLOAK_INTERNAL_URL
-            - name: KEYCLOAK_REALM
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: KEYCLOAK_REALM
-            - name: MONGO_DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: MONGO_DB_NAME
-            - name: MONGO_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: MONGO_URI
-            - name: NODE_PATH
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: NODE_PATH
-            - name: PORT_USERS_SERVICE
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: PORT_USERS_SERVICE
-            - name: POSTGRES_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: POSTGRES_URI
+          - name: ADMIN_KEYCLOAK_CLIENT_ID
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: ADMIN_KEYCLOAK_CLIENT_ID
+          - name: ADMIN_KEYCLOAK_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: ADMIN_KEYCLOAK_CLIENT_SECRET
+          - name: KEYCLOAK_INTERNAL_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: KEYCLOAK_INTERNAL_URL
+          - name: KEYCLOAK_REALM
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: KEYCLOAK_REALM
+          - name: MONGO_DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: MONGO_DB_NAME
+          - name: MONGO_URI
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: MONGO_URI
+          - name: NODE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: NODE_PATH
+          - name: PORT_USERS_SERVICE
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: PORT_USERS_SERVICE
+          - name: POSTGRES_URI
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: POSTGRES_URI
           image: mkalejta/users-service:latest
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:8001/health
-            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           name: users-service
           ports:
             - containerPort: 8001
