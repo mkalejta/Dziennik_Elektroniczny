@@ -35,16 +35,13 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: KEYCLOAK_DB_PASSWORD
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - keycloak
+          readinessProbe:
+            tcpSocket:
+              port: 5432
             initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 5
-            timeoutSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 10
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: keycloak-postgres-data

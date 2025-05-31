@@ -90,7 +90,7 @@ async function createKeycloakUser({ name, surname, email, username, role }) {
 
     // Zapisz utworzonego użytkownika do pliku CSV
     fs.appendFileSync(
-        path.join(__dirname, '../../created-users.csv'),
+        '/usr/src/app/csv/created-users.csv',
         `${username},${temporaryPassword}\n`
     );
 

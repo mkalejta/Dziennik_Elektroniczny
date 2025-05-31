@@ -82,4 +82,12 @@ spec:
           ports:
             - containerPort: 8001
               protocol: TCP
+          volumeMounts:
+            - name: users-csv
+              mountPath: /usr/src/app/csv/created-users.csv
       restartPolicy: Always
+      volumes:
+        - name: users-csv
+          hostPath:
+            path: /run/desktop/mnt/host/c/Users/kalej/Uczelnia/DziennikElektroniczny/services/users-service/created-users.csv
+            type: FileOrCreate

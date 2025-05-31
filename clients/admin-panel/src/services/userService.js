@@ -54,7 +54,6 @@ async function createUser(req, res) {
         'Authorization': `Bearer ${accessToken}`
       }
     });
-    console.log('User created:', newUser.data);
     res.status(201).json(newUser.data);
   } catch (error) {
     console.error('Error creating user:', error);

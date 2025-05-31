@@ -59,14 +59,13 @@ spec:
                   key: KEYCLOAK_PUBLIC_URL
           image: mkalejta/admin-panel:latest
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:4000/health
-            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           name: admin-panel
           ports:
             - containerPort: 4000

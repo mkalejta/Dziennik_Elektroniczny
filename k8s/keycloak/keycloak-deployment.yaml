@@ -45,6 +45,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: KEYCLOAK_ADMIN_PASSWORD
+            - name: KC_HOSTNAME
+              value: localhost
           image: quay.io/keycloak/keycloak:24.0.1
           name: keycloak
           ports:

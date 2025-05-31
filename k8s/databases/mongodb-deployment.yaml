@@ -41,11 +41,13 @@ spec:
                   key: MONGO_DB_NAME
           ports:
             - containerPort: 27017
-          livenessProbe:
+          readinessProbe:
             tcpSocket:
               port: 27017
-            initialDelaySeconds: 10
-            periodSeconds: 30
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 10
           volumeMounts:
             - name: mongo-init
               mountPath: /docker-entrypoint-initdb.d/

@@ -35,18 +35,13 @@ spec:
                   key: POSTGRES_PASSWORD
           ports:
             - containerPort: 5432
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - admin
-                - -d
-                - gradebookdb
-            initialDelaySeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 5
+            timeoutSeconds: 2
+            failureThreshold: 10
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
@@ -59,4 +54,3 @@ spec:
         - name: postgres-init
           configMap:
             name: postgres-init-script
-            

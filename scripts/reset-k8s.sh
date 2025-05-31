@@ -55,10 +55,12 @@ echo "Wszystkie wymagane pody są gotowe."
 kubectl port-forward svc/web-client 5173:80 -n dziennik &
 kubectl port-forward svc/admin-panel 4000:4000 -n dziennik &
 kubectl port-forward svc/keycloak 8080:8080 -n dziennik &
+kubectl port-forward svc/api-gateway 8081:8081 -n dziennik &
 
 echo "Port-forwarding uruchomiony. Dostęp:"
 echo "Web-client:   http://localhost:5173"
 echo "Admin-panel:  http://localhost:4000"
 echo "Keycloak:     http://localhost:8080"
+echo "API Gateway:  http://localhost:8081"
 
 wait

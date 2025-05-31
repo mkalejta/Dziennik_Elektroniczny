@@ -61,14 +61,13 @@ spec:
                   key: SHEET_ID
           image: mkalejta/reports-client:latest
           livenessProbe:
-            exec:
-              command:
-                - curl
-                - -f
-                - http://localhost:4001/health
-            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 4001
+            initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           name: reports-client
           ports:
             - containerPort: 4001

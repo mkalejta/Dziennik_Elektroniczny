@@ -60,7 +60,6 @@ router.get('/auth', async (req, res) => {
   axios.post(tokenEndpoint, params)
     .then(result => {
       const { access_token, refresh_token, expires_in } = result.data;
-      console.log(result.data);
 
       req.session.access_token = access_token;
       req.session.refresh_token = refresh_token;
