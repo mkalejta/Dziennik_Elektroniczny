@@ -5,20 +5,19 @@ metadata:
     io.kompose.service: api-gateway
   name: api-gateway
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: api-gateway
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
         io.kompose.service: api-gateway
     spec:
       containers:
-        - env:
+        name: api-gateway
+        image: mkalejta/api-gateway:latest
+        env:
           - name: PORT_API_GATEWAY
             valueFrom:
               configMapKeyRef:
@@ -64,17 +63,15 @@ spec:
               configMapKeyRef:
                 name: app-config
                 key: PORT_USERS_SERVICE
-          image: mkalejta/api-gateway:latest
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8081
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 5
-          name: api-gateway
-          ports:
-            - containerPort: 8081
-              protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        ports:
+          - containerPort: 8081
+            protocol: TCP
       restartPolicy: Always

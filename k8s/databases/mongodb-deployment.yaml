@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.36.0 (ae2a39403)
   labels:
     app: mongodb
   name: mongodb
@@ -18,41 +15,41 @@ spec:
         app: mongodb
     spec:
       containers:
-        - name: mongodb
-          image: mongo:7.0
-          args:
-            - mongod
-            - --bind_ip_all
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: MONGO_INITDB_ROOT_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: MONGO_INITDB_ROOT_PASSWORD
-            - name: MONGO_DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: MONGO_DB_NAME
-          ports:
-            - containerPort: 27017
-          readinessProbe:
-            tcpSocket:
-              port: 27017
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 10
-          volumeMounts:
-            - name: mongo-init
-              mountPath: /docker-entrypoint-initdb.d/
-            - name: mongo-data
-              mountPath: /data/db
+        name: mongodb
+        image: mongo:7.0
+        args:
+          - mongod
+          - --bind_ip_all
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: MONGO_INITDB_ROOT_PASSWORD
+          - name: MONGO_DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: MONGO_DB_NAME
+        ports:
+          - containerPort: 27017
+        readinessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 10
+        volumeMounts:
+          - name: mongo-init
+            mountPath: /docker-entrypoint-initdb.d/
+          - name: mongo-data
+            mountPath: /data/db
       volumes:
         - name: mongo-data
           persistentVolumeClaim:

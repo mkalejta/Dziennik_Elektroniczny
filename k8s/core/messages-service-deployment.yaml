@@ -1,14 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.36.0 (ae2a39403)
   labels:
     io.kompose.service: messages-service
   name: messages-service
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: messages-service
@@ -16,14 +13,13 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
         io.kompose.service: messages-service
     spec:
       containers:
-        - env:
+        name: messages-service
+        image: mkalejta/messages-service:latest
+        env:
           - name: KEYCLOAK_INTERNAL_URL
             valueFrom:
               configMapKeyRef:
@@ -59,17 +55,15 @@ spec:
               configMapKeyRef:
                 name: app-config
                 key: POSTGRES_URI
-          image: mkalejta/messages-service:latest
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8006
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 5
-          name: messages-service
-          ports:
-            - containerPort: 8006
-              protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8006
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        ports:
+          - containerPort: 8006
+            protocol: TCP
       restartPolicy: Always

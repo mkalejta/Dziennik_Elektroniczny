@@ -1,14 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.36.0 (ae2a39403)
   labels:
     io.kompose.service: timetable-service
   name: timetable-service
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: timetable-service
@@ -16,14 +13,13 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
         io.kompose.service: timetable-service
     spec:
       containers:
-        - env:
+        name: timetable-service
+        image: mkalejta/timetable-service:latest
+        env:
           - name: KEYCLOAK_INTERNAL_URL
             valueFrom:
               configMapKeyRef:
@@ -59,17 +55,15 @@ spec:
               configMapKeyRef:
                 name: app-config
                 key: POSTGRES_URI
-          image: mkalejta/timetable-service:latest
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8005
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 5
-          name: timetable-service
-          ports:
-            - containerPort: 8005
-              protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8005
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        ports:
+          - containerPort: 8005
+            protocol: TCP
       restartPolicy: Always

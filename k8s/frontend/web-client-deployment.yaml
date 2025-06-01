@@ -15,7 +15,9 @@ spec:
         io.kompose.service: web-client
     spec:
       containers:
-        - env:
+        name: web-client
+        image: mkalejta/web-client:latest
+        env:
           - name: KEYCLOAK_INTERNAL_URL
             valueFrom:
               configMapKeyRef:
@@ -36,17 +38,15 @@ spec:
               configMapKeyRef:
                 name: app-config
                 key: PORT_WEB_CLIENT
-          image: mkalejta/web-client:latest
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 5
-          name: web-client
-          ports:
-            - containerPort: 80
-              protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        ports:
+          - containerPort: 80
+            protocol: TCP
       restartPolicy: Always

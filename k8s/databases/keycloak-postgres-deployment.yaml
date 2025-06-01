@@ -17,34 +17,34 @@ spec:
         app: keycloak-postgres
     spec:
       containers:
-        - name: keycloak-postgres
-          image: postgres:16
-          env:
-            - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: KEYCLOAK_DB_NAME
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: KEYCLOAK_DB_USER
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: KEYCLOAK_DB_PASSWORD
-          readinessProbe:
-            tcpSocket:
-              port: 5432
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 10
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data
-              name: keycloak-postgres-data
+        name: keycloak-postgres
+        image: postgres:16
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: app-config
+                key: KEYCLOAK_DB_NAME
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: KEYCLOAK_DB_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: KEYCLOAK_DB_PASSWORD
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 10
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: keycloak-postgres-data
       restartPolicy: Always
       volumes:
         - name: keycloak-postgres-data

@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.36.0 (ae2a39403)
   labels:
     io.kompose.service: redis
   name: redis
@@ -14,24 +11,21 @@ spec:
       io.kompose.service: redis
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.36.0 (ae2a39403)
       labels:
         io.kompose.service: redis
     spec:
       containers:
-        - image: redis:7-alpine
-          livenessProbe:
-            exec:
-              command:
-                - redis-cli
-                - ping
-            failureThreshold: 5
-            periodSeconds: 30
-            timeoutSeconds: 10
-          name: redis
-          ports:
-            - containerPort: 6379
-              protocol: TCP
+        name: redis
+        image: redis:7-alpine
+        livenessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+          failureThreshold: 5
+          periodSeconds: 30
+          timeoutSeconds: 10
+        ports:
+          - containerPort: 6379
+            protocol: TCP
       restartPolicy: Always
