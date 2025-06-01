@@ -15,53 +15,53 @@ spec:
         io.kompose.service: admin-panel
     spec:
       containers:
-        name: admin-panel
-        image: mkalejta/admin-panel:latest
-        env:
-          - name: ADMIN_API_GATEWAY_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: ADMIN_API_GATEWAY_URL
-          - name: ADMIN_KEYCLOAK_CLIENT_ID
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: ADMIN_KEYCLOAK_CLIENT_ID
-          - name: ADMIN_KEYCLOAK_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: ADMIN_KEYCLOAK_CLIENT_SECRET
-          - name: ADMIN_KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: ADMIN_KEYCLOAK_REALM
-          - name: ADMIN_SESSION_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: ADMIN_SESSION_SECRET
-          - name: KEYCLOAK_INTERNAL_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_INTERNAL_URL
-          - name: KEYCLOAK_PUBLIC_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_PUBLIC_URL
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 4000
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 5
-        ports:
-          - containerPort: 4000
-            protocol: TCP
+        - name: admin-panel
+          image: mkalejta/admin-panel:latest
+          env:
+            - name: ADMIN_API_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_API_GATEWAY_URL
+            - name: ADMIN_KEYCLOAK_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_KEYCLOAK_CLIENT_ID
+            - name: ADMIN_KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ADMIN_KEYCLOAK_CLIENT_SECRET
+            - name: ADMIN_KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_KEYCLOAK_REALM
+            - name: ADMIN_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ADMIN_SESSION_SECRET
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_PUBLIC_URL
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          ports:
+            - containerPort: 4000
+              protocol: TCP
       restartPolicy: Always

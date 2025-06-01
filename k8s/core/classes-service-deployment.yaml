@@ -17,53 +17,60 @@ spec:
         io.kompose.service: classes-service
     spec:
       containers:
-        name: classes-service
-        image: mkalejta/classes-service:latest
-        env:
-          - name: KEYCLOAK_INTERNAL_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_INTERNAL_URL
-          - name: KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_REALM
-          - name: MONGO_DB_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: MONGO_DB_NAME
-          - name: MONGO_URI
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: MONGO_URI
-          - name: NODE_PATH
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: NODE_PATH
-          - name: PORT_CLASS_SERVICE
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: PORT_CLASS_SERVICE
-          - name: POSTGRES_URI
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: POSTGRES_URI
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8007
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 5
-        ports:
-          - containerPort: 8007
-            protocol: TCP
+        - name: classes-service
+          image: mkalejta/classes-service:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          env:
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_DB_NAME
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_URI
+            - name: NODE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NODE_PATH
+            - name: PORT_CLASS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_CLASS_SERVICE
+            - name: POSTGRES_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_URI
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8007
+            initialDelaySeconds: 80
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          ports:
+            - containerPort: 8007
+              protocol: TCP
       restartPolicy: Always

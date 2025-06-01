@@ -19,9 +19,7 @@ const getUsers = async (req, res) => {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
-    }).then(res => res.data.map(subject => ({
-      name: subject.name
-    })));
+    }).then(res => [...new Set(res.data.map(subject => subject.name))]);
     res.render('users', { users: users.data, classes: classes.data, subjects });
   } catch (error) {
     console.error('Error fetching users:', error);

@@ -17,68 +17,75 @@ spec:
         io.kompose.service: users-service
     spec:
       containers:
-        name: users-service
-        image: mkalejta/users-service:latest
-        env:
-          - name: ADMIN_KEYCLOAK_CLIENT_ID
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: ADMIN_KEYCLOAK_CLIENT_ID
-          - name: ADMIN_KEYCLOAK_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: ADMIN_KEYCLOAK_CLIENT_SECRET
-          - name: KEYCLOAK_INTERNAL_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_INTERNAL_URL
-          - name: KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_REALM
-          - name: MONGO_DB_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: MONGO_DB_NAME
-          - name: MONGO_URI
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: MONGO_URI
-          - name: NODE_PATH
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: NODE_PATH
-          - name: PORT_USERS_SERVICE
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: PORT_USERS_SERVICE
-          - name: POSTGRES_URI
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: POSTGRES_URI
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8001
-          initialDelaySeconds: 30
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 5
-        ports:
-          - containerPort: 8001
-            protocol: TCP
-        volumeMounts:
-          - name: users-csv
-            mountPath: /usr/src/app/csv/created-users.csv
+        - name: users-service
+          image: mkalejta/users-service:latest
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          env:
+            - name: ADMIN_KEYCLOAK_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ADMIN_KEYCLOAK_CLIENT_ID
+            - name: ADMIN_KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ADMIN_KEYCLOAK_CLIENT_SECRET
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_DB_NAME
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MONGO_URI
+            - name: NODE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NODE_PATH
+            - name: PORT_USERS_SERVICE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_USERS_SERVICE
+            - name: POSTGRES_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: POSTGRES_URI
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 80
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          ports:
+            - containerPort: 8001
+              protocol: TCP
+          volumeMounts:
+            - name: users-csv
+              mountPath: /usr/src/app/csv/created-users.csv
       restartPolicy: Always
       volumes:
         - name: users-csv

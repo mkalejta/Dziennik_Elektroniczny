@@ -25,10 +25,11 @@ kubectl apply -f k8s/core/
 echo "Tworzę frontend..."
 kubectl apply -f k8s/frontend/
 
-if [ -d k8s/infra ]; then
-  echo "Tworzę zasoby infrastrukturalne (infra)..."
-  kubectl apply -f k8s/infra/
-fi
+echo "Tworzę zasoby infrastrukturalne (infra)..."
+kubectl apply -f k8s/infra/
+
+echo "Tworzę HPA..."
+kubectl apply -f k8s/hpa/
 
 echo "Gotowe! Wszystkie zasoby zostały odtworzone w namespace dziennik."
 

@@ -15,38 +15,38 @@ spec:
         io.kompose.service: web-client
     spec:
       containers:
-        name: web-client
-        image: mkalejta/web-client:latest
-        env:
-          - name: KEYCLOAK_INTERNAL_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_INTERNAL_URL
-          - name: KEYCLOAK_PUBLIC_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_PUBLIC_URL
-          - name: KEYCLOAK_REALM
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_REALM
-          - name: PORT_WEB_CLIENT
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: PORT_WEB_CLIENT
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 5
-        ports:
-          - containerPort: 80
-            protocol: TCP
+        - name: web-client
+          image: mkalejta/web-client:latest
+          env:
+            - name: KEYCLOAK_INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: KEYCLOAK_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_PUBLIC_URL
+            - name: KEYCLOAK_REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: PORT_WEB_CLIENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_WEB_CLIENT
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          ports:
+            - containerPort: 80
+              protocol: TCP
       restartPolicy: Always

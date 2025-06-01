@@ -17,58 +17,58 @@ spec:
         io.kompose.service: reports-client
     spec:
       containers:
-        name: reports-client
-        image: mkalejta/reports-client:latest
-        env:
-          - name: API_GATEWAY_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: REPORTS_API_GATEWAY_URL
-          - name: CLIENT_ID
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: REPORTS_KEYCLOAK_CLIENT_ID
-          - name: CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: app-secrets
-                key: REPORTS_KEYCLOAK_CLIENT_SECRET
-          - name: INTERNAL_URL
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_INTERNAL_URL
-          - name: PORT
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: PORT_REPORTS_CLIENT
-          - name: REALM
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: KEYCLOAK_REALM
-          - name: SHEET_ID
-            valueFrom:
-              configMapKeyRef:
-                name: app-config
-                key: SHEET_ID
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 4001
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 5
-        ports:
-          - containerPort: 4001
-            protocol: TCP
-        volumeMounts:
-          - mountPath: /usr/src/app/reports
-            name: reports-data
+        - name: reports-client
+          image: mkalejta/reports-client:latest
+          env:
+            - name: API_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REPORTS_API_GATEWAY_URL
+            - name: CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: REPORTS_KEYCLOAK_CLIENT_ID
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: REPORTS_KEYCLOAK_CLIENT_SECRET
+            - name: INTERNAL_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_INTERNAL_URL
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: PORT_REPORTS_CLIENT
+            - name: REALM
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: KEYCLOAK_REALM
+            - name: SHEET_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SHEET_ID
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4001
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          ports:
+            - containerPort: 4001
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/src/app/reports
+              name: reports-data
       restartPolicy: Always
       volumes:
         - name: reports-data
