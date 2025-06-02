@@ -17,8 +17,7 @@ async function getAllUsers(req, res) {
 }
 
 async function createUser(req, res) {
-    const { name, surname, email, username, role, classId, childId } = req.body;
-    const { subject } = req.body.subject || {};
+    const { name, surname, email, username, role, classId, childId, subject } = req.body;
 
     if (!name || !surname || !username || !role) {
         return res.status(400).send('Missing required fields');
