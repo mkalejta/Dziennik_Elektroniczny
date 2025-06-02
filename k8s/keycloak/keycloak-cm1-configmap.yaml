@@ -464,12 +464,12 @@ data:
         "credentials" : [ {
           "id" : "745258a5-96ab-444c-a04f-7cc272a2f5a6",
           "type" : "password",
-          "createdDate" : 1748161528789,
-          "secretData" : "{\"value\":\"B50T5G+38iQPtJl5jjf1/lgDAq/bo0lPIBTDhRU84r5p58qN0fTllQZ5eBAF3UIgLHUsoMwOwn78CZYP5WBMyw==\",\"salt\":\"S5kbKSlC2BmPftm3i3U+9g==\",\"additionalParameters\":{}}",
+          "createdDate" : 1748856327555,
+          "secretData" : "{\"value\":\"OQ/oP/Hlhlk0Bxb/cI/SApjSw9StkCd2RlKviGDgNoZe9L9N27l0dCxb7FaWW+JYQ5q5LkorakhIf6YAn57Dfg==\",\"salt\":\"aYNuPvFYzyskcMeqKus01A==\",\"additionalParameters\":{}}",
           "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
         } ],
         "disableableCredentialTypes" : [ ],
-        "requiredActions" : [ "UPDATE_PASSWORD" ],
+        "requiredActions" : [ ],
         "realmRoles" : [ "default-roles-gradebook", "parent" ],
         "notBefore" : 0,
         "groups" : [ ]
@@ -1336,12 +1336,12 @@ data:
         "credentials" : [ {
           "id" : "42d299fe-5dc6-462a-bbf0-1e164f1728a3",
           "type" : "password",
-          "createdDate" : 1748161514818,
-          "secretData" : "{\"value\":\"HoZZ2pQOKNP4OtJ4t2FohS/377G6CjU7QfPuey7ZQ15WYJNu/ugT9TpBpaj3fmerdvLqaB0OHZ4WTqH73wjORQ==\",\"salt\":\"LOU9gg0oWgvbwdnUcgg97w==\",\"additionalParameters\":{}}",
+          "createdDate" : 1748856262719,
+          "secretData" : "{\"value\":\"MyF36iUnWK04Tg1Fwt6aFSrFNfWieFT4dh9t6LtFVpQmHRrRh1kcvTyBBnx/JrWJxFnizMa5w41Cz5uXE9kOFQ==\",\"salt\":\"tE5Bh/UPZrs95kGRMf0dzQ==\",\"additionalParameters\":{}}",
           "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
         } ],
         "disableableCredentialTypes" : [ ],
-        "requiredActions" : [ "UPDATE_PASSWORD" ],
+        "requiredActions" : [ ],
         "realmRoles" : [ "default-roles-gradebook", "student" ],
         "notBefore" : 0,
         "groups" : [ ]
@@ -2176,12 +2176,12 @@ data:
         "credentials" : [ {
           "id" : "999c5509-5138-4760-ad23-b5997a3ed537",
           "type" : "password",
-          "createdDate" : 1748161544168,
-          "secretData" : "{\"value\":\"I/PIw7Jd8ugN65BdXAjxuDhZNu36ATUI0qiu3WjiMKwO8Q0AT7qB/I9iP/pBMu2qbvbcEgtoGFiDJIJXiT8FwQ==\",\"salt\":\"PTUBA9aHrfvzzTHBcnS4NA==\",\"additionalParameters\":{}}",
+          "createdDate" : 1748856008872,
+          "secretData" : "{\"value\":\"0XUuagl1MHU0wlL/R3wZhr4rtIKRhGvQVNEIPvMQPLq5ziYdFfH40geuOJ03O0MAGjYL5/0Z+ynpoqEhJP7V2A==\",\"salt\":\"cuZ1EvsHQ1rKmv7BsCMIhA==\",\"additionalParameters\":{}}",
           "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
         } ],
         "disableableCredentialTypes" : [ ],
-        "requiredActions" : [ "UPDATE_PASSWORD" ],
+        "requiredActions" : [ ],
         "realmRoles" : [ "default-roles-gradebook", "teacher" ],
         "notBefore" : 0,
         "groups" : [ ]
@@ -3619,7 +3619,7 @@ data:
           "subType" : "authenticated",
           "subComponents" : { },
           "config" : {
-            "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper" ]
+            "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper" ]
           }
         }, {
           "id" : "454e9dc7-55ab-4c0d-9238-640fea6263ec",
@@ -3647,7 +3647,7 @@ data:
           "subType" : "anonymous",
           "subComponents" : { },
           "config" : {
-            "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper" ]
+            "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper" ]
           }
         }, {
           "id" : "70ef4fe8-503c-4d2f-a6f5-c1cfa2f6ff30",
