@@ -152,7 +152,7 @@ services:
       - ADMIN_KEYCLOAK_CLIENT_SECRET=${ADMIN_KEYCLOAK_CLIENT_SECRET}
     volumes:
       - ./shared:/usr/src/app/shared:ro
-      - ./services/users-service/created-users.csv:/usr/src/app/created-users.csv
+      - ./services/users-service/created-users.csv:/usr/src/app/csv/created-users.csv
     depends_on:
       - mongodb
       - postgres

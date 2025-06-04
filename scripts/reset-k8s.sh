@@ -37,17 +37,13 @@ echo "Czekam aż pody web-client, admin-panel i keycloak będą w stanie Running
 
 for app in web-client admin-panel keycloak; do
   echo -n "Czekam na pod $app..."
-  for i in {1..120}; do
+  while true; do
     status=$(kubectl get pods -n dziennik -l "io.kompose.service=$app" -o jsonpath="{.items[0].status.phase}")
     if [ "$status" == "Running" ]; then
       echo " OK"
       break
     fi
     sleep 1
-    if [ $i -eq 120 ]; then
-      echo " NIE POWIODŁO SIĘ"
-      exit 1
-    fi
   done
 done
 
