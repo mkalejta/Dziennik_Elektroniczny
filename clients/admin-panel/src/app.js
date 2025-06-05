@@ -9,6 +9,7 @@ const indexRoutes = require('./routes/indexRoute.js');
 const userRoutes = require('./routes/userRoutes.js');
 const timetableRoutes = require('./routes/timetableRoutes.js');
 const { ensureValidToken } = require('./middleware/tokenMiddleware.js');
+const onlyAdmin = require('./middleware/onlyAdmin');
 
 dotenv.config();
 
@@ -42,8 +43,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/health', (req, res) => res.send('OK'));
 app.use('/', indexRoutes);
-app.use('/users', ensureValidToken, userRoutes);
-app.use('/timetable', ensureValidToken, timetableRoutes);
+app.use('/users', ensureValidToken, onlyAdmin, userRoutes);
+app.use('/timetable', ensureValidToken, onlyAdmin, timetableRoutes);
 
 app.listen(4000, '0.0.0.0', () => {
   console.log('Admin panel SSR running on http://localhost:4000');

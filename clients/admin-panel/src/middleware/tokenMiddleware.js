@@ -1,5 +1,6 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 dotenv.config();
 
 const ensureValidToken = async (req, res, next) => {
@@ -29,10 +30,21 @@ const ensureValidToken = async (req, res, next) => {
 
       req.session.access_token = tokenResponse.data.access_token;
       req.session.refresh_token = tokenResponse.data.refresh_token;
+      req.session.id_token = tokenResponse.data.id_token; 
       req.session.token_expires_at = Date.now() + tokenResponse.data.expires_in * 1000;
       await req.session.save();
+
+      req.session.user = jwt.decode(req.session.access_token);
+      
     } catch (err) {
       console.error('Token refresh failed:', err);
+      return res.redirect('/login');
+    }
+  } else {
+    try {
+      req.session.user = jwt.decode(req.session.access_token);
+    } catch (err) {
+      console.error('JWT decode failed:', err);
       return res.redirect('/login');
     }
   }

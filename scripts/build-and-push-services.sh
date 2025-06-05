@@ -16,19 +16,19 @@ SERVICES=(
 )
 
 CLIENTS=(
-  # web-client
-  # admin-panel
+  web-client
+  admin-panel
   reports-client
 )
 
 # Budowanie i wypychanie wieloplatformowych obrazów
-# for SERVICE in "${SERVICES[@]}"; do
-#   echo "Buduję wieloplatformowy obraz: mkalejta/${SERVICE}:latest"
-#   docker buildx build --platform linux/amd64,linux/arm64 \
-#     -t mkalejta/${SERVICE}:latest \
-#     -f services/${SERVICE}/Dockerfile . \
-#     --push
-# done
+for SERVICE in "${SERVICES[@]}"; do
+  echo "Buduję wieloplatformowy obraz: mkalejta/${SERVICE}:latest"
+  docker buildx build --platform linux/amd64,linux/arm64 \
+    -t mkalejta/${SERVICE}:latest \
+    -f services/${SERVICE}/Dockerfile . \
+    --push
+done
 
 for CLIENT in "${CLIENTS[@]}"; do
   echo "Buduję wieloplatformowy obraz: mkalejta/${CLIENT}:latest"

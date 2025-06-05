@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 dotenv.config();
 
@@ -35,7 +36,7 @@ state=1234&
 redirect_uri=${redirectUrl}&
 code_challenge=${codeChallenge}&
 code_challenge_method=S256&
-scope=offline_access`;
+scope=openid offline_access`;
 
 router.get('/', (req, res) => {
   res.render('dashboard', {
@@ -59,14 +60,23 @@ router.get('/auth', async (req, res) => {
 
   axios.post(tokenEndpoint, params)
     .then(result => {
-      const { access_token, refresh_token, expires_in } = result.data;
+      const { access_token, refresh_token, expires_in, id_token } = result.data;
 
       req.session.access_token = access_token;
       req.session.refresh_token = refresh_token;
+      req.session.id_token = id_token;
       req.session.token_expires_at = Date.now() + expires_in * 1000;
-      if (typeof expires_in !== 'number') {
-        throw new Error('expires_in nie jest liczbą');
+      req.session.user = jwt.decode(access_token);
+
+      const userRoles =
+        req.session.user &&
+        (req.session.user.realm_access?.roles || req.session.user.resource_access?.['account']?.roles);
+
+      if (!userRoles || !userRoles.includes('admin')) {
+        res.redirect('/logout');
+        return;
       }
+
       req.session.save((err) => {
         if (err) {
           console.error('Błąd podczas zapisu sesji:', err);
@@ -81,9 +91,14 @@ router.get('/auth', async (req, res) => {
 });
 
 router.get('/logout', async (req, res) => {
-  req.session.destroy(async () => {
-    await axios.post(`${KEYCLOAK_INTERNAL_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/logout`);
-    res.redirect("/");
+  const idToken = req.session.id_token;
+  req.session.destroy(() => {
+    const redirectUri = 'http://localhost:4000/';
+    let logoutUrl = `${KEYCLOAK_PUBLIC_URL}/realms/${ADMIN_KEYCLOAK_REALM}/protocol/openid-connect/logout?post_logout_redirect_uri=${redirectUri}`;
+    if (idToken) {
+      logoutUrl += `&id_token_hint=${idToken}`;
+    }
+    res.redirect(logoutUrl);
   });
 });
 

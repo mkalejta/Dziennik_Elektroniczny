@@ -69,8 +69,15 @@ spec:
           volumeMounts:
             - mountPath: /usr/src/app/reports
               name: reports-data
+            - name: service-account
+              mountPath: /usr/src/app/google/service-account.json
+              subPath: service-account.json
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: reports-data
           persistentVolumeClaim:
             claimName: reports-data
+        - name: service-account
+          secret:
+            secretName: reports-service-account

@@ -404,6 +404,7 @@ services:
       retries: 5
     volumes:
       - reports_data:/usr/src/app/reports
+      - ./clients/reports-client/google/service-account.json:/usr/src/app/google/service-account.json:ro
 
 volumes:
   mongo_data:

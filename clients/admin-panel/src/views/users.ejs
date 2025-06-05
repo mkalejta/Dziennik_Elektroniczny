@@ -209,15 +209,20 @@
       }
       // Zapisz filtr roli przed reloadem
       localStorage.setItem('users_role_filter', roleFilter.value);
-      const res = await fetch('http://localhost:4000/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) {
-        location.reload();
-      } else {
-        alert('Błąd podczas dodawania użytkownika');
+      try {
+        const res = await fetch('http://localhost:4000/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          location.reload();
+        } else {
+          const errorText = await res.text();
+          alert('Błąd podczas dodawania użytkownika: ' + errorText);
+        }
+      } catch (err) {
+        alert('Błąd sieci lub serwera: ' + err.message);
       }
     });
 

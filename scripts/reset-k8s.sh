@@ -10,6 +10,10 @@ done
 
 kubectl create namespace dziennik
 
+kubectl create secret generic reports-service-account \
+  --from-file=service-account.json=clients/reports-client/google/service-account.json \
+  -n dziennik --dry-run=client -o yaml > k8s/base/reports-service-account-secret.yaml
+
 kubectl config set-context --current --namespace=dziennik
 
 echo "Tworzę zasoby bazowe (sekrety, configmapy, ingress)..."

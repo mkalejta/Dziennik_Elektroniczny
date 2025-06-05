@@ -55,6 +55,9 @@
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Docker Compose](https://docs.docker.com/compose/)
+- (dla Kubernetes) [kubectl](https://kubernetes.io/docs/tasks/tools/) oraz lokalny klaster (np. Docker Desktop z włączonym K8s lub Minikube)
+
+---
 
 ### 2. Klonowanie repozytorium
 
@@ -63,75 +66,80 @@ git clone <adres_repozytorium>
 cd DziennikElektroniczny
 ```
 
+---
+
 ### 3. Pliki konfiguracyjne
 
 - Plik `.env` jest już skonfigurowany.
 - Plik `realm-export.json` zawiera użytkowników i konfigurację Keycloak.
 - Plik `services/users-service/created-users.csv` zawiera loginy i tymczasowe hasła użytkowników do testów.
+- **Plik `clients/reports-client/google/service-account.json` NIE jest w repozytorium.**  
+  Poproś autora projektu o ten plik.
+
+---
 
 ### 4. Pierwsze uruchomienie
 
-**(Opcjonalnie) Usuń stare wolumeny danych:**
-```sh
-docker volume rm mongo_data postgres_data keycloak_data keycloak_postgres_data reports_data
-```
-
-**Pobierz obrazy i uruchom aplikację:**
-```sh
-docker-compose pull
-docker-compose up -d
-```
-
-**Sprawdź status:**
-```sh
-docker-compose ps
-```
-
-**Sprawdź logi (opcjonalnie):**
-```sh
-docker-compose logs -f
-```
-
-### 5. Dostęp do aplikacji
-
-- **Web-client (uczeń/nauczyciel/rodzic):**  
-  [http://localhost:5173](http://localhost:5173)
-- **Admin-panel:**  
-  [http://localhost:4000](http://localhost:4000)
-  Login: `admin1`, Hasło: `admin1`
-- **Keycloak (panel administracyjny):**  
-  [http://localhost:8080](http://localhost:8080)  
-  Login: `admin`, Hasło: `admin`
-- **Loginy i tymczasowe hasła użytkowników:**  
-  W pliku `services/users-service/created-users.csv`
-
-### 6. Skrypt czyszczący tymczasowe hasła użytkowników
-
-W katalogu `scripts/` znajduje się skrypt `clean-temporary-passwords.js`, który służy do **automatycznego usuwania z pliku `created-users.csv` tych użytkowników, którzy zmienili już swoje tymczasowe hasło w Keycloak**.
-
-#### Jak działa?
-
-- Skrypt sprawdza w Keycloak, czy użytkownik ma wymuszoną akcję zmiany hasła (`UPDATE_PASSWORD` w polu `requiredActions`).
-- Jeśli użytkownik NIE musi już zmieniać hasła (czyli hasło zostało zmienione), jego dane są usuwane z pliku CSV.
-- Dzięki temu plik `created-users.csv` zawiera tylko tych użytkowników, którzy nadal mają aktywne tymczasowe hasło.
-
-#### Jak uruchomić?
-
-1. Upewnij się, że masz zainstalowane zależności (w katalogu /scripts):
+1. **(Opcjonalnie) Usuń stare wolumeny danych:**
    ```sh
-   npm install axios dotenv
+   docker volume rm mongo_data postgres_data keycloak_data keycloak_postgres_data reports_data
    ```
-2. Uruchom skrypt:
+
+2. **Upewnij się, że masz plik `clients/reports-client/google/service-account.json` w odpowiedniej lokalizacji.**
+
+3. **Pobierz obrazy i uruchom aplikację:**
    ```sh
-   node scripts/clean-temporary-passwords.js
+   docker-compose pull
+   docker-compose up -d
    ```
-3. Po wykonaniu, plik `services/users-service/created-users.csv` zostanie zaktualizowany.
+
+4. **Sprawdź status:**
+   ```sh
+   docker-compose ps
+   ```
+
+5. **Sprawdź logi (opcjonalnie):**
+   ```sh
+   docker-compose logs -f
+   ```
+
+6. **Dostęp do aplikacji:**
+   - Web-client: [http://localhost:5173](http://localhost:5173)
+     Login: `student1`, Hasło: `student1`
+     Login: `parent1`, Hasło: `parent1`
+     Login: `teacher1`, Hasło: `teacher1`
+   - Admin-panel: [http://localhost:4000](http://localhost:4000)  
+     Login: `admin1`, Hasło: `admin1`
+   - Keycloak: [http://localhost:8080](http://localhost:8080)  
+     Login: `admin`, Hasło: `admin`
+
+---
+
+## ▶️ Uruchomienie przez Kubernetes
+
+1. **Upewnij się, że masz plik `clients/reports-client/google/service-account.json` w odpowiedniej lokalizacji.**
+
+2. **Zresetuj i wdroż wszystkie zasoby (skrypt automatyczny):**
+   ```sh
+    chmod +x ./scripts/reset-k8s.sh
+    ./scripts/reset-k8s.sh
+   ```
+   Skrypt:
+   - Usuwa i tworzy namespace `dziennik`
+   - Tworzy secreta z pliku `clients/reports-client/google/service-account.json` jako `reports-service-account` (plik YAML w `k8s/base/`)
+   - Wdraża wszystkie zasoby (`kubectl apply -f ...`)
+   - Ustawia port-forwarding do najważniejszych serwisów
+
+3. **Dostęp do aplikacji:**
+   - Web-client: [http://localhost:5173](http://localhost:5173)
+   - Admin-panel: [http://localhost:4000](http://localhost:4000)
+   - Keycloak: [http://localhost:8080](http://localhost:8080)
 
 ---
 
 ## ℹ️ Dodatkowe informacje
 
-- Wszystkie serwisy komunikują się po nazwach kontenerów (dzięki sieci `gradebook-net`).
+- Wszystkie serwisy komunikują się po nazwach kontenerów (dzięki sieci `gradebook-net`/namespace `dziennik`).
 - Dane użytkowników i hasła testowe są dostępne w CSV.
 - Po pierwszym uruchomieniu Keycloak automatycznie zaimportuje realm z pliku `realm-export.json`.
 - Jeśli chcesz wyeksportować aktualny stan realmu Keycloak:
@@ -139,4 +147,7 @@ W katalogu `scripts/` znajduje się skrypt `clean-temporary-passwords.js`, któr
   docker exec -it <keycloak_container_name> /opt/keycloak/bin/kc.sh export --dir=/tmp --realm=gradebook --users=realm_file
   docker cp <keycloak_container_name>:/tmp/gradebook-realm.json ./realm-export.json
   ```
----
+
+**Uwaga!**  
+Plik `clients/reports-client/google/service-account.json` jest wymagany do działania serwisu `reports-client`, ale nie znajduje się w repozytorium ani w obrazie Dockera.  
+**Trzeba posiadać ten plik lokalnie i zamontować go zgodnie z instrukcją powyżej.**
