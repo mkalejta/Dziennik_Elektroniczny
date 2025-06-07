@@ -119,6 +119,43 @@ cd DziennikElektroniczny
 
 1. **Upewnij się, że masz plik `clients/reports-client/google/service-account.json` w odpowiedniej lokalizacji.**
 
+### Uwaga dotycząca pliku `created-users.csv` i wolumenu hostPath
+
+Serwis `users-service` korzysta z pliku `services/users-service/created-users.csv`, który jest montowany do kontenera przez wolumen typu `hostPath`.  
+Aby działało to poprawnie na Twoim komputerze, musisz **zmienić ścieżkę w pliku**  
+`k8s/core/users-service-deployment.yaml`  
+w sekcji:
+
+```yaml
+volumes:
+  - name: users-csv
+    hostPath:
+      path: /run/desktop/mnt/host/c/Users/kalej/Uczelnia/DziennikElektroniczny/services/users-service/created-users.csv
+      type: FileOrCreate
+```
+
+na **absolutną ścieżkę do pliku na Twoim systemie**.
+
+> **Uwaga:**  
+> Przykładowa ścieżka dla Docker Desktop na Windows/Mac:  
+> `/run/desktop/mnt/host/c/Users/TWOJA_NAZWA/Uczelnia/DziennikElektroniczny/services/users-service/created-users.csv`  
+> Przykładowa ścieżka dla Linuxa:  
+> `/home/TWOJA_NAZWA/Uczelnia/DziennikElektroniczny/services/users-service/created-users.csv`
+
+---
+
+### Uwaga dotycząca autoskalowania (HPA)
+
+Aby działało automatyczne skalowanie podów (HPA), Twój klaster Kubernetes musi mieć zainstalowany [metrics-server](https://github.com/kubernetes-sigs/metrics-server).
+
+- **Minikube:**  
+  Uruchom: `minikube addons enable metrics-server`
+
+- **Docker Desktop:**  
+  Zainstaluj metrics-server zgodnie z [oficjalną instrukcją](https://docs.docker.com/desktop/kubernetes/#installing-additional-tools).
+
+Jeśli metrics-server nie jest dostępny, zasoby HPA nie będą działać poprawnie.
+
 2. **Zresetuj i wdroż wszystkie zasoby (skrypt automatyczny):**
    ```sh
     chmod +x ./scripts/reset-k8s.sh

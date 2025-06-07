@@ -5,7 +5,7 @@ metadata:
     io.kompose.service: messages-service
   name: messages-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: messages-service
@@ -16,6 +16,10 @@ spec:
       labels:
         io.kompose.service: messages-service
     spec:
+      initContainers:
+        - name: wait-for-keycloak
+          image: curlimages/curl:latest
+          command: ['sh', '-c', 'until curl -sf http://keycloak:8080/realms/gradebook; do echo waiting for keycloak; sleep 5; done']
       containers:
         - name: messages-service
           image: mkalejta/messages-service:latest
@@ -24,8 +28,8 @@ spec:
               cpu: 50m
               memory: 64Mi
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 200m
+              memory: 256Mi
           env:
             - name: KEYCLOAK_INTERNAL_URL
               valueFrom:
@@ -66,7 +70,7 @@ spec:
             httpGet:
               path: /health
               port: 8006
-            initialDelaySeconds: 80
+            initialDelaySeconds: 20
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 5

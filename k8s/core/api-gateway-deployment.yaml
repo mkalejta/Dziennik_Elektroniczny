@@ -5,7 +5,7 @@ metadata:
     io.kompose.service: api-gateway
   name: api-gateway
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: api-gateway
@@ -22,8 +22,8 @@ spec:
               cpu: 50m
               memory: 64Mi
             limits:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 200m
+              memory: 256Mi
           env:
             - name: PORT_API_GATEWAY
               valueFrom:
@@ -74,7 +74,7 @@ spec:
             httpGet:
               path: /health
               port: 8081
-            initialDelaySeconds: 80
+            initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 5

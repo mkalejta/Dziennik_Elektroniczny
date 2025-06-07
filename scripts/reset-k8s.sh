@@ -16,7 +16,7 @@ kubectl create secret generic reports-service-account \
 
 kubectl config set-context --current --namespace=dziennik
 
-echo "Tworzę zasoby bazowe (sekrety, configmapy, ingress)..."
+echo "Tworzę zasoby bazowe (sekrety, configmapy)..."
 kubectl apply -f k8s/base/
 
 echo "Tworzę bazy danych i Keycloak..."
